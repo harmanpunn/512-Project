@@ -10,7 +10,9 @@ class Graph:
 
     def __init__(self) -> None:
         self.e_count = 0
-        self.node_count = Environment.getInstance()
+        self.node_count = Environment.getInstance().node_count
+
+        self.info = self.generate_graph()
 
     def generate_graph(self):
         graph = defaultdict(list)

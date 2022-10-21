@@ -18,3 +18,8 @@ class Renderer:
             pygame.init()
             self.surface = pygame.display.set_mode((500, 500))
             pygame.display.set_caption('Circle of Life')
+    
+
+    # Rendering
+    def __render__(self):
+        pass
