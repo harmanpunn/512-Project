@@ -7,8 +7,18 @@ from graph import Graph
 from renderer import Renderer
 import pygame
 
+
+def str2bool(v):
+  
+    if v.lower() == "true":
+        return True
+    elif v.lower()=="false":
+        return False
+    else:
+        raise RuntimeError("Invalid value")
+
 allowed_args = {
-    "ui":bool,
+    "ui":str2bool,
     "node_count":int,
 }
 
@@ -18,36 +28,50 @@ def processArgs():
     if len(sys.argv)>1:
         
         argv = sys.argv[1:]
-        print(argv)
+        args = {}
         for x in argv:
             if x[0:2]!="--":
                 raise RuntimeError("Args start with '--'")
+            x = x.split('--')[1]
             
             if len(x.split("="))!=2:
                 raise RuntimeError("Arg needs single '='")
-    
+            x = x.split("=")
+            if not x[0] in allowed_args.keys():
+                raise RuntimeError("Invalid Argument")
+
+            try:
+                args[x[0]]= allowed_args[x[0]](x[1])
+            except:
+                raise ValueError("Invalid value '"+x[1]+"' for "+x[0])
+        
+        return args    
     return {}
 
 args = processArgs()
 
-# env = Environment(True,50)
+env = Environment(True,50)
 
-# graph = Graph()
+for x in args.keys():
+    setattr(env,x,args[x]) 
 
-# renderer =  Renderer(graph)
+graph = Graph()
 
-# if __name__=="__main__":
-#     print("Initialized")
-#     print(graph.info)
+renderer =  Renderer(graph)
 
-#     running = True
+if __name__=="__main__":
+    print("Initialized")
+    print(graph.info)
 
-#     while running:
-#         for event in pygame.event.get():
-#             if event.type==pygame.QUIT:
-#                 running =True
+    running = True
+
+    while running:
+        if Environment.getInstance().ui:
+            for event in pygame.event.get():
+                if event.type==pygame.QUIT:
+                    running =True
         
-#         renderer.__render__()
+        renderer.__render__()
     
-
-#     pygame.quit()
+    if Environment.getInstance().ui:
+        pygame.quit()
