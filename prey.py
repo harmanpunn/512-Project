@@ -19,7 +19,7 @@ class Prey:
         x = random.choice(lst)
         self.position = x 
 
-    def prey_position(self, graph):
+    def prey_position(self):
         return self.position   
         
 p = Prey()
