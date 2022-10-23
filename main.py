@@ -6,6 +6,9 @@ from environment import Environment
 from graph import Graph
 from renderer import Renderer
 import pygame
+from agent1 import Agent1
+from predator import Predator
+from prey import Prey
 
 
 def str2bool(v):
@@ -21,6 +24,23 @@ allowed_args = {
     "ui":str2bool,
     "node_count":int,
 }
+
+def startGame():
+
+    graph_inst = Graph()
+    
+    graph = graph_inst.generate_graph()
+    # graph = graph_instance.generate_graph()
+    print('graph:',graph)
+
+
+    prey = Prey(graph_inst)
+    predator = Predator(graph_inst)
+    agent1 = Agent1(graph_inst, prey, predator)
+
+
+    agent1.__update__(graph, prey, predator)
+
 
 def processArgs():
     print("Number of args: ",str(len(sys.argv)))
@@ -57,13 +77,13 @@ for x in args.keys():
 
 graph = Graph()
 
-renderer =  Renderer(graph)
+# renderer =  Renderer(graph)
 
 if __name__=="__main__":
     print("Initialized")
-    print(graph.info)
+    startGame()
 
-    running = True
+    running = False
 
     while running:
         if Environment.getInstance().ui:

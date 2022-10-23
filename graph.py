@@ -47,3 +47,6 @@ class Graph:
             trial+=1    
 
         return graph    
+
+    def allocate_pos(self):
+        return random.randint(0,49)     

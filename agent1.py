@@ -7,8 +7,8 @@ class Agent1:
 
         while True:
             self.position = graph.allocate_pos();
-            if (self.position != prey.prey_position and 
-                self.position != predator.predator_position):
+            if (self.position != prey.prey_position() and 
+                self.position != predator.predator_position()):
                 break
     
 
@@ -16,6 +16,9 @@ class Agent1:
         
         # neighbor_list = graph[self.position]
         print('Agent Pos Curr:', self.position)
+        print('Prey Position:', prey.prey_position())
+        print('Predator Position:', predator.predator_position())
+        
         curr_agent = self.position
         agent_shortest_dist_prey = get_shortest_path(graph, curr_agent, prey.prey_position())
         print('agent_shortest_dist_prey:', agent_shortest_dist_prey)
@@ -32,20 +35,53 @@ class Agent1:
             # Updating the lookup table
             lookup_table[el] = [path_len_to_predator, path_len_to_prey]
 
-        
-            
+        next_position = self.get_next_position(lookup_table, agent_shortest_dist_prey, agent_shortest_dist_predator)
+        print('next_position',next_position)
+        self.position = next_position 
+        # for key in lookup_table:
+        #     print(key ,'->',lookup_table[key] ) 
+    
+
+    def get_next_position(self, lookup_table, agent_shortest_dist_prey, agent_shortest_dist_predator):
+        next_position = self.position
+        for key in lookup_table:
+            print(key ,'->',lookup_table[key] ) 
+            # Neighbor that is closer to Prey and farther from the Predator.
+            if (lookup_table[key][1] < agent_shortest_dist_prey and  
+                lookup_table[key][0] > agent_shortest_dist_predator):
+                next_position = key
+                break
+
+            # Neighbors that are closer to the Prey and not closer to the Predator.
+            elif (lookup_table[key][1] < agent_shortest_dist_prey and
+                lookup_table[key][0] == agent_shortest_dist_predator):    
+                next_position = key
+                break
+
+            # Neighbors that are not farther from the Prey and farther from the Predator.
+            elif (lookup_table[key][1] == agent_shortest_dist_prey and 
+                lookup_table[key][0] > agent_shortest_dist_predator):
+                next_position = key
+                break
+
+            # Neighbors that are not farther from the Prey and not closer to the Predator.
+            elif (lookup_table[key][1] == agent_shortest_dist_prey and
+                lookup_table[key][0] == agent_shortest_dist_predator):
+                next_position = key
+                break
+
+            # Neighbors that are farther from the Predator.
+            elif (lookup_table[key][0] > agent_shortest_dist_predator):
+                next_position = key 
+                break
+
+            # Neighbors that are not closer to the Predator.
+            elif (lookup_table[key][0] == agent_shortest_dist_predator):
+                next_position = key
+                break  
 
 
-
-
-        print('lookup_table:', lookup_table)    
-
-
-
-        
-
-
-
+        return next_position
 
     def agent_postion(self):
         return self.position

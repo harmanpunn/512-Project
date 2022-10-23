@@ -1,12 +1,13 @@
 def get_shortest_path(graph, src, dest):
     # print('src:',src)
     # print('dest:',dest)
-
+    if src == dest:
+        return 0;
     distance = []
     predecessor = list()
 
     for i in range(len(graph)):
-        distance.insert(i,9999)
+        distance.insert(i,99999)
         predecessor.insert(i,-1)
 
     if shortest_path(graph, src, dest, distance, predecessor):
@@ -21,7 +22,7 @@ def get_shortest_path(graph, src, dest):
 
         
         # print("Shortest path : ", path)
-        print('New Position:', path[len(path) - 2])
+        # print('New Position:', path[len(path) - 2])
         return len(path)    
 
 
@@ -47,6 +48,4 @@ def shortest_path(graph, src, dest, distance, predecessor):
 
                     if graph[curr][i] == dest:
                         return True
-                        
-
         return False
