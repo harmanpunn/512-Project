@@ -8,15 +8,17 @@ from graph import Graph
 
 class Predator:
 
-    def __init__(self) -> None:
-        self.position = random.randint(0,49)
+    def __init__(self, graph) -> None:
+        # self.position = random.randint(0,49)
+        self.position = graph.allocate_pos()
 
+
+    
     '''
     Update the predator's position such that it moves to a neighbor node
     with shortest distance to agent 
     '''
     def __update__(self, graph, agent_position):
-        print('Graph:', graph)
         src = self.position
         dest = agent_position
         distance = []
@@ -73,7 +75,3 @@ class Predator:
     def predator_position(self):
         return self.position 
 
-
-p = Predator()
-g = Graph().generate_graph()
-p.__update__(g, 23)
