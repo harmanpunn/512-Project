@@ -1,44 +1,48 @@
-    
+import random
+from graph import Graph
+from graphEntity import GraphEntity
 from util import get_shortest_path
 
 
-class Agent1:
-    def __init__(self, graph, prey, predator) -> None:
-
+class Agent1(GraphEntity):
+    def __init__(self, graph : Graph) -> None:
+        self.type = 1
         while True:
-            self.position = graph.allocate_pos();
-            if (self.position != prey.prey_position() and 
-                self.position != predator.predator_position()):
+            self.position = random.randint(0,49)
+            if not graph.node_states[self.position][0] and not graph.node_states[self.position][2]:
                 break
+        
+        graph.allocate_pos(self.position, self.type)
     
 
-    def __update__(self, graph, prey, predator) -> None:
-        
+    def plan(self, graph, info) -> None:
+        prey = info['prey']
+        predator = info['predator']
+        graphInfo = graph.info
         # neighbor_list = graph[self.position]
         print('Agent Pos Curr:', self.position)
-        print('Prey Position:', prey.prey_position())
-        print('Predator Position:', predator.predator_position())
+        print('Prey Position:', prey)
+        print('Predator Position:', predator)
         
         curr_agent = self.position
-        agent_shortest_dist_prey = get_shortest_path(graph, curr_agent, prey.prey_position())
+        agent_shortest_dist_prey = get_shortest_path(graphInfo, curr_agent, prey)
         print('agent_shortest_dist_prey:', agent_shortest_dist_prey)
-        agent_shortest_dist_predator = get_shortest_path(graph, curr_agent, predator.predator_position())
+        agent_shortest_dist_predator = get_shortest_path(graphInfo, curr_agent, predator)
         print('agent_shortest_dist_predator:', agent_shortest_dist_predator)
 
-        neighbor_list = graph[self.position]
+        neighbor_list = graphInfo[self.position]
         lookup_table = dict()
         for el in neighbor_list:
             # Shortest Path to prey
-            path_len_to_prey = get_shortest_path(graph, el, prey.prey_position())
+            path_len_to_prey = get_shortest_path(graphInfo, el, prey)
             # Shortest Path to predator
-            path_len_to_predator = get_shortest_path(graph, el, predator.predator_position())
+            path_len_to_predator = get_shortest_path(graphInfo, el, predator)
             # Updating the lookup table
             lookup_table[el] = [path_len_to_predator, path_len_to_prey]
 
-        next_position = self.get_next_position(lookup_table, agent_shortest_dist_prey, agent_shortest_dist_predator)
-        print('next_position',next_position)
-        self.position = next_position 
-    
+        self.nextPosition = self.get_next_position(lookup_table, agent_shortest_dist_prey, agent_shortest_dist_predator)
+        
+        # self.move(graph)
 
     def get_next_position(self, lookup_table, agent_shortest_dist_prey, agent_shortest_dist_predator):
         next_position = self.position
@@ -80,6 +84,3 @@ class Agent1:
 
 
         return next_position
-
-    def agent_postion(self):
-        return self.position

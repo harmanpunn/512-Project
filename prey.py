@@ -3,24 +3,30 @@
 import random
 # from random import random
 from graph import Graph
+from graphEntity import GraphEntity
 
-class Prey:
+"""
+
+Prey class extends GraphEntity
+
+"""
+class Prey(GraphEntity):
    
-    def __init__(self, graph) -> None:
+    def __init__(self, graph : Graph) -> None:
         # Prey Spawn Position
-        # self.position = random.randint(0,49)
-        self.position = graph.allocate_pos()
+        self.type = 2
+        self.position = random.randint(0,49)
 
-    def __update__(self,graph):
+        # Allocate Node in graph
+        graph.allocate_pos(self.position, self.type)
+
+    def plan(self,graph : Graph, info):
         lst = list()
         lst.append(self.position)
-        for el in graph[self.position]:
+        for el in graph.info[self.position]:
             lst.append(el)
 
         x = random.choice(lst)
-        self.position = x 
-
-    def prey_position(self):
-        return self.position   
+        self.nextPosition = x
         
         

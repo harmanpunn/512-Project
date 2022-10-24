@@ -5,30 +5,36 @@ import random
 from turtle import distance
 
 from graph import Graph
+from graphEntity import GraphEntity
 
-class Predator:
+class Predator(GraphEntity):
+    
 
     def __init__(self, graph) -> None:
-        # self.position = random.randint(0,49)
-        self.position = graph.allocate_pos()
-
-
+        super().__init__()    
+        self.type = 0
+        self.position = random.randint(0,49)
+        graph.allocate_pos(self.position,self.type)
     
     '''
     Update the predator's position such that it moves to a neighbor node
     with shortest distance to agent 
     '''
-    def __update__(self, graph, agent_position):
+    def plan(self, graph, info):
+        
+        agent_position = info['agent']
+        graphInfo = graph.info
+
         src = self.position
         dest = agent_position
         distance = []
         predecessor = list()
 
-        for i in range(len(graph)):
+        for i in range(len(graphInfo)):
             distance.insert(i,9999)
             predecessor.insert(i,-1)
 
-        if self.shortest_path(graph, src, dest, distance, predecessor):
+        if self.shortest_path(graphInfo, src, dest, distance, predecessor):
             print('Short path is available')
             path = []
             j = dest
@@ -43,7 +49,7 @@ class Predator:
             print('New Position:', path[len(path) - 2])
 
         # Update position of the predator
-        self.position = path[len(path) - 2]
+        self.nextPosition = path[len(path) - 2]
 
 
     def shortest_path(self, graph, src, dest, distance, predecessor):
@@ -71,7 +77,4 @@ class Predator:
                         return True
 
         return False
-
-    def predator_position(self):
-        return self.position 
 

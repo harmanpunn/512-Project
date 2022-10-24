@@ -29,6 +29,7 @@ class Renderer:
             self.node_centers.append((center[0]+ 200*math.cos(2*i*math.pi/self.node_count),center[1]+ 200*math.sin(2*i*math.pi/self.node_count)))
         
         self.graph_info = graph.info
+        self.node_states = graph.node_states
 
         self.edge_rects = []
         self.edge_angles = []
@@ -72,15 +73,32 @@ class Renderer:
         
         for i in range(0,len(self.edge_rects)):
             pygame.draw.arc(self.surface,(0,0,0),self.edge_rects[i],self.edge_angles[i][0],self.edge_angles[i][1])
-        for i in range(0, self.node_count):  
-            radius = 10
-            text = self.font.render(str(i), True, (0,0,0))
-            textRect = text.get_rect()
-            textRect.center = self.node_centers[i]
-            pygame.draw.circle(self.surface, self.node_colors[i], self.node_centers[i], radius)
-            pygame.draw.circle(self.surface, (0,0,0), self.node_centers[i] , radius,width=1)
-            self.surface.blit(text,textRect)
-
+        for i in range(0, self.node_count):
+            tileState = -1
+            for k in range(0,3):
+                if self.node_states[i][k]:
+                    tileState = k
+                    break
+            
+            if tileState==-1:
+                radius = 10
+                text = self.font.render(str(i), True, (0,0,0))
+                textRect = text.get_rect()
+                textRect.center = self.node_centers[i]
+                pygame.draw.circle(self.surface, (200,200,200), self.node_centers[i], radius)
+                pygame.draw.circle(self.surface, (0,0,0), self.node_centers[i] , radius,width=1)
+                self.surface.blit(text,textRect)
+            else:
+                img = None
+                if tileState == 0 :
+                    img = pygame.image.load("./sprites/predator.png")
+                elif tileState == 1 :
+                    img = pygame.image.load("./sprites/player.png")
+                elif tileState == 2 :
+                    img = pygame.image.load("./sprites/prey.png")
+                
+                # print(tileState)
+                self.surface.blit(img,((self.node_centers[i][0]-16,self.node_centers[i][1]-16)))
         # center  = (self.screenSize[0]/2,self.screenSize[1]/2)
         # p1 = self.node_centers[0]
         # p2 = self.node_centers[1]

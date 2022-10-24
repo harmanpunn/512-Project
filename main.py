@@ -1,5 +1,6 @@
 import sys
 import os
+from time import sleep
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 
 from environment import Environment
@@ -23,12 +24,10 @@ def str2bool(v):
 allowed_args = {
     "ui":str2bool,
     "node_count":int,
+    "mode":int
 }
 
 def startGame():
-
-    
-
     graph_inst = Graph()
     
     graph = graph_inst.generate_graph()
@@ -50,23 +49,20 @@ def startGame():
         predator.__update__(graph, agent1.agent_postion())
         prey.__update__(graph)
         agent_pos_track.append(agent1.agent_postion())
-        prey_post_track.append(prey.prey_position())
-        predator_pos_track.append(predator.predator_position())
+        prey_post_track.append(prey.getPosition())
+        predator_pos_track.append(predator.getPosition())
 
-        if agent1.agent_postion() == predator.predator_position():
+        if agent1.agent_postion() == predator.getPosition():
             print('Agent Loses :(')
             state = "OVER"
 
-        if agent1.agent_postion() == prey.prey_position():
+        if agent1.agent_postion() == prey.getPosition():
             print('Agent Wins :)')
             state = "OVER"
 
     print('Agent Path: ', agent_pos_track)
     print('Prey Path: ', prey_post_track)
     print('Predator Path: ', predator_pos_track)
-
-    
-
 
 def processArgs():
     print("Number of args: ",str(len(sys.argv)))
@@ -94,30 +90,53 @@ def processArgs():
         return args    
     return {}
 
-args = processArgs()
+def runGame(args):
+    env = Environment(True,50)
+    for x in args.keys():
+        setattr(env,x,args[x]) 
 
-env = Environment(True,50)
+    graph = Graph()
+    renderer =  Renderer(graph)
+    # print("Initialized")
+    # startGame()
 
-for x in args.keys():
-    setattr(env,x,args[x]) 
+    prey = Prey(graph)
+    predator = Predator(graph)
+    agent1 = Agent1(graph)
 
-graph = Graph()
+    
 
-# renderer =  Renderer(graph)
-
-if __name__=="__main__":
-    print("Initialized")
-    startGame()
-
-    running = False
+    running = True
 
     while running:
         if Environment.getInstance().ui:
+            sleep(0.2)
             for event in pygame.event.get():
                 if event.type==pygame.QUIT:
-                    running =True
+                    running =False
+        agent1.__update__(graph, {
+            'prey' : prey.getPosition(),
+            'predator' : predator.getPosition()
+        })
         
+        predator.__update__(graph, {'agent':agent1.getPosition()})
+        prey.__update__(graph)
         renderer.__render__()
+
+        if agent1.getPosition() == predator.getPosition():
+            print('Agent Loses :(')
+            running = False
+
+        if agent1.getPosition() == prey.getPosition():
+            print('Agent Wins :)')
+            running = False
+
     
     if Environment.getInstance().ui:
         pygame.quit()
+
+if __name__ == "__main__":
+    args = processArgs()
+    if 'mode' in args.keys() and args['mode']==1:
+        print("Mode different")
+    runGame(args)

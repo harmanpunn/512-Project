@@ -12,6 +12,9 @@ class Graph:
         self.node_count = Environment.getInstance().node_count
 
         self.info = self.generate_graph()
+        self.node_states = {}
+        for i in range(0,50):
+            self.node_states[i] = [False, False, False]
 
     def generate_graph(self):
         graph = defaultdict(list)
@@ -48,5 +51,5 @@ class Graph:
 
         return graph    
 
-    def allocate_pos(self):
-        return random.randint(0,49)     
+    def allocate_pos(self, x: int, k : int):
+        self.node_states[x][k] = True
