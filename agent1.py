@@ -38,8 +38,6 @@ class Agent1:
         next_position = self.get_next_position(lookup_table, agent_shortest_dist_prey, agent_shortest_dist_predator)
         print('next_position',next_position)
         self.position = next_position 
-        # for key in lookup_table:
-        #     print(key ,'->',lookup_table[key] ) 
     
 
     def get_next_position(self, lookup_table, agent_shortest_dist_prey, agent_shortest_dist_predator):

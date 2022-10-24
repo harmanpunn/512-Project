@@ -27,6 +27,8 @@ allowed_args = {
 
 def startGame():
 
+    
+
     graph_inst = Graph()
     
     graph = graph_inst.generate_graph()
@@ -38,8 +40,25 @@ def startGame():
     predator = Predator(graph_inst)
     agent1 = Agent1(graph_inst, prey, predator)
 
+    state = "RUNNING"
+    agent_pos_track = list()
+    while state == "RUNNING":
+        agent1.__update__(graph, prey, predator)
+        agent_pos_track.append(agent1.agent_postion())
+        predator.__update__(graph, agent1.agent_postion())
+        prey.__update__(graph)
 
-    agent1.__update__(graph, prey, predator)
+        if agent1.agent_postion() == predator.predator_position():
+            print('Agent Loses :(')
+            state = "OVER"
+
+        if agent1.agent_postion() == prey.prey_position():
+            print('Agent Wins :)')
+            state = "OVER"
+
+    print('Agent Path: ', agent_pos_track)
+
+    
 
 
 def processArgs():
