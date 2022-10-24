@@ -42,11 +42,16 @@ def startGame():
 
     state = "RUNNING"
     agent_pos_track = list()
+    prey_post_track = list()
+    predator_pos_track = list()
     while state == "RUNNING":
         agent1.__update__(graph, prey, predator)
-        agent_pos_track.append(agent1.agent_postion())
+        
         predator.__update__(graph, agent1.agent_postion())
         prey.__update__(graph)
+        agent_pos_track.append(agent1.agent_postion())
+        prey_post_track.append(prey.prey_position())
+        predator_pos_track.append(predator.predator_position())
 
         if agent1.agent_postion() == predator.predator_position():
             print('Agent Loses :(')
@@ -57,6 +62,8 @@ def startGame():
             state = "OVER"
 
     print('Agent Path: ', agent_pos_track)
+    print('Prey Path: ', prey_post_track)
+    print('Predator Path: ', predator_pos_track)
 
     
 
