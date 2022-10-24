@@ -104,30 +104,24 @@ def runGame(args):
     predator = Predator(graph)
     agent1 = Agent1(graph)
 
-    """
-    if =
-    """
     running = 1
-    
 
-    gameOverMax = 20
-    gameOverCounter = 0
-
-    while gameOverCounter<gameOverMax:
+    while True:
         if Environment.getInstance().ui:
-            if running == 1:
-                sleep(0.2)
+            sleep(0.2)
             for event in pygame.event.get():
                 if event.type==pygame.QUIT:
                     running =False
-        
-        if running == 1:
+        if running==1:
             agent1.__update__(graph, {
                 'prey' : prey.getPosition(),
                 'predator' : predator.getPosition()
             })
+            
             predator.__update__(graph, {'agent':agent1.getPosition()})
             prey.__update__(graph)
+            renderer.__render__(running)
+        
             if agent1.getPosition() == predator.getPosition():
                 print('Agent Loses :(')
                 running = 0
@@ -136,14 +130,10 @@ def runGame(args):
                 print('Agent Wins :)')
                 running = 2
         else:
-            # print(gameOverCounter)
-            sleep(0.1)
             if Environment.getInstance().ui:
-                gameOverCounter+=1
-            else:
-                gameOverCounter = gameOverMax
-        
-        renderer.__render__(running)
+                renderer.__render__(running)
+                sleep(4)
+            break
 
     
     if Environment.getInstance().ui:
