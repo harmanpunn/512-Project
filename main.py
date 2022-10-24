@@ -104,32 +104,36 @@ def runGame(args):
     predator = Predator(graph)
     agent1 = Agent1(graph)
 
-    
+    running = 1
 
-    running = True
-
-    while running:
+    while True:
         if Environment.getInstance().ui:
             sleep(0.2)
             for event in pygame.event.get():
                 if event.type==pygame.QUIT:
                     running =False
-        agent1.__update__(graph, {
-            'prey' : prey.getPosition(),
-            'predator' : predator.getPosition()
-        })
+        if running==1:
+            agent1.__update__(graph, {
+                'prey' : prey.getPosition(),
+                'predator' : predator.getPosition()
+            })
+            
+            predator.__update__(graph, {'agent':agent1.getPosition()})
+            prey.__update__(graph)
+            renderer.__render__(running)
         
-        predator.__update__(graph, {'agent':agent1.getPosition()})
-        prey.__update__(graph)
-        renderer.__render__()
+            if agent1.getPosition() == predator.getPosition():
+                print('Agent Loses :(')
+                running = 0
 
-        if agent1.getPosition() == predator.getPosition():
-            print('Agent Loses :(')
-            running = False
-
-        if agent1.getPosition() == prey.getPosition():
-            print('Agent Wins :)')
-            running = False
+            if agent1.getPosition() == prey.getPosition():
+                print('Agent Wins :)')
+                running = 2
+        else:
+            if Environment.getInstance().ui:
+                renderer.__render__(running)
+                sleep(4)
+            break
 
     
     if Environment.getInstance().ui:
