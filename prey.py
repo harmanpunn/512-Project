@@ -6,9 +6,10 @@ from graph import Graph
 
 class Prey:
    
-    def __init__(self) -> None:
+    def __init__(self, graph) -> None:
         # Prey Spawn Position
-        self.position = random.randint(0,49)
+        # self.position = random.randint(0,49)
+        self.position = graph.allocate_pos()
 
     def __update__(self,graph):
         lst = list()
@@ -19,13 +20,7 @@ class Prey:
         x = random.choice(lst)
         self.position = x 
 
-    def prey_position(self, graph):
+    def prey_position(self):
         return self.position   
         
-p = Prey()
-g = Graph().generate_graph()
-
-print(p.__update__(g))
-print(p.prey_position(g))
-
         
