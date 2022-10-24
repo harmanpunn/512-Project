@@ -66,7 +66,7 @@ class Renderer:
         return angle
 
     # Rendering
-    def __render__(self):
+    def __render__(self, running = 1):
         if not Environment.getInstance().ui:
             return
         self.surface.fill((217,217,217))
@@ -107,7 +107,14 @@ class Renderer:
         # ym = (p1[1]+p2[1])/2
         # r = Renderer.norm(p1,p2)/2   
         # pygame.draw.rect(self.surface,(0,0,0),self.edge_rects[i],width=1)
+        if running!=1:
+            if running==0:
+                text = pygame.font.Font('freesansbold.ttf',20).render('Agent Loses :(', True, (0,0,0))
+            else:
+                text = pygame.font.Font('freesansbold.ttf',20).render('Agent Wins :)', True, (0,0,0))
 
+            # textRect = (Game.map_size[0]*2,Game.map_size[1]*5)
+            self.surface.blit(text, (20,20))
         pygame.display.flip()
         pass
 
