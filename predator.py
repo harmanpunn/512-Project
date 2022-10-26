@@ -6,6 +6,7 @@ from turtle import distance
 
 from graph import Graph
 from graphEntity import GraphEntity
+from util import get_shortest_path
 
 class Predator(GraphEntity):
     
@@ -24,7 +25,17 @@ class Predator(GraphEntity):
         
         agent_position = info['agent']
         graphInfo = graph.info
+        min_len = 999
+        next_position = self.position
+        neighbor_list = graphInfo[self.position]
+        for el in neighbor_list:
+            path_len_to_agent = get_shortest_path(graphInfo, el, agent_position)
+            if path_len_to_agent < min_len:
+                next_position = el
+                min_len = path_len_to_agent
+                
 
+        '''
         src = self.position
         dest = agent_position
         distance = []
@@ -47,9 +58,9 @@ class Predator(GraphEntity):
 
             print("Shortest path : ", path)
             print('New Position:', path[len(path) - 2])
-
+        '''
         # Update position of the predator
-        self.nextPosition = path[len(path) - 2]
+        self.nextPosition = next_position
 
 
     def shortest_path(self, graph, src, dest, distance, predecessor):

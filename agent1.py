@@ -46,41 +46,43 @@ class Agent1(GraphEntity):
 
     def get_next_position(self, lookup_table, agent_shortest_dist_prey, agent_shortest_dist_predator):
         next_position = self.position
+        order_list = [None]*6
         for key in lookup_table:
             print(key ,'->',lookup_table[key] ) 
             # Neighbor that is closer to Prey and farther from the Predator.
             if (lookup_table[key][1] < agent_shortest_dist_prey and  
                 lookup_table[key][0] > agent_shortest_dist_predator):
                 next_position = key
-                break
+                order_list.insert(0,key);
 
             # Neighbors that are closer to the Prey and not closer to the Predator.
             elif (lookup_table[key][1] < agent_shortest_dist_prey and
                 lookup_table[key][0] == agent_shortest_dist_predator):    
                 next_position = key
-                break
+                order_list.insert(1,key);
 
             # Neighbors that are not farther from the Prey and farther from the Predator.
             elif (lookup_table[key][1] == agent_shortest_dist_prey and 
                 lookup_table[key][0] > agent_shortest_dist_predator):
                 next_position = key
-                break
+                order_list.insert(2,key);
 
             # Neighbors that are not farther from the Prey and not closer to the Predator.
             elif (lookup_table[key][1] == agent_shortest_dist_prey and
                 lookup_table[key][0] == agent_shortest_dist_predator):
                 next_position = key
-                break
+                order_list.insert(3,key);
 
             # Neighbors that are farther from the Predator.
             elif (lookup_table[key][0] > agent_shortest_dist_predator):
                 next_position = key 
-                break
+                order_list.insert(4,key);
 
             # Neighbors that are not closer to the Predator.
             elif (lookup_table[key][0] == agent_shortest_dist_predator):
                 next_position = key
-                break  
+                order_list.insert(5,key);
 
-
-        return next_position
+        print('order_list:', order_list)
+        print('first item:', next(item for item in order_list if item is not None))
+        return next(item for item in order_list if item is not None)
