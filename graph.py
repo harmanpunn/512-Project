@@ -13,7 +13,7 @@ class Graph:
 
         self.info = self.generate_graph()
         self.node_states = {}
-        for i in range(0,50):
+        for i in range(0,Environment.getInstance().node_count):
             self.node_states[i] = [False, False, False]
 
     def generate_graph(self):

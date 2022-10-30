@@ -14,6 +14,7 @@ class Environment:
         if len(Environment.instances)==0:
             self.ui = ui
             self.node_count = nc
+            self.agent = 1
             Environment.instances.append(self)
         else:
             raise RuntimeError("Initialising Environment multiple times!")

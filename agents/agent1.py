@@ -2,13 +2,14 @@ import random
 from graph import Graph
 from graphEntity import GraphEntity
 from util import get_shortest_path
+from environment import Environment
 
 
 class Agent1(GraphEntity):
     def __init__(self, graph : Graph) -> None:
         self.type = 1
         while True:
-            self.position = random.randint(0,49)
+            self.position = random.randint(0,Environment.getInstance().node_count-1)
             if not graph.node_states[self.position][0] and not graph.node_states[self.position][2]:
                 break
         
@@ -82,7 +83,10 @@ class Agent1(GraphEntity):
             elif (lookup_table[key][0] == agent_shortest_dist_predator):
                 next_position = key
                 order_list.insert(5,key);
-
+        
+        ls = [item for item in order_list if item is not None]
+        if len(ls)==0:
+            return self.position
         print('order_list:', order_list)
-        print('first item:', next(item for item in order_list if item is not None))
-        return next(item for item in order_list if item is not None)
+        print('first item:', ls[0])
+        return ls[0]
