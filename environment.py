@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 
 Singleton class to hold all the environment constants
@@ -14,13 +15,14 @@ class Environment:
         if len(Environment.instances)==0:
             self.ui = ui
             self.node_count = nc
+            self.agent = 1
             Environment.instances.append(self)
         else:
             raise RuntimeError("Initialising Environment multiple times!")
     
     # to get the instance of the environment class
     @classmethod
-    def getInstance(cls):
+    def getInstance(cls) -> Environment:
         if len(Environment.instances)==0:
             raise RuntimeError("Environment not initialised!")
         return Environment.instances[0]

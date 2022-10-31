@@ -1,5 +1,4 @@
-from dis import dis
-from math import dist
+from environment import Environment
 import random
 # from random import random
 from turtle import distance
@@ -14,7 +13,7 @@ class Predator(GraphEntity):
     def __init__(self, graph) -> None:
         super().__init__()    
         self.type = 0
-        self.position = random.randint(0,49)
+        self.position = random.randint(0,Environment.getInstance().node_count-1)
         graph.allocate_pos(self.position,self.type)
     
     '''

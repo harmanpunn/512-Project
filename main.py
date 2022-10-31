@@ -1,16 +1,22 @@
 import sys
 import os
 from time import sleep
+
+from graphEntity import GraphEntity
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 
 from environment import Environment
 from graph import Graph
 from renderer import Renderer
 import pygame
-from agent1 import Agent1
+
+from agents.agent1 import Agent1
+from agents.agent3 import Agent3
+
 from predator import Predator
 from prey import Prey
 
+get_class = lambda x: globals()[x]
 
 def str2bool(v):
   
@@ -24,45 +30,9 @@ def str2bool(v):
 allowed_args = {
     "ui":str2bool,
     "node_count":int,
-    "mode":int
+    "mode":int,
+    "agent":int
 }
-
-def startGame():
-    graph_inst = Graph()
-    
-    graph = graph_inst.generate_graph()
-    # graph = graph_instance.generate_graph()
-    print('graph:',graph)
-
-
-    prey = Prey(graph_inst)
-    predator = Predator(graph_inst)
-    agent1 = Agent1(graph_inst, prey, predator)
-
-    state = "RUNNING"
-    agent_pos_track = list()
-    prey_post_track = list()
-    predator_pos_track = list()
-    while state == "RUNNING":
-        agent1.__update__(graph, prey, predator)
-        
-        predator.__update__(graph, agent1.agent_postion())
-        prey.__update__(graph)
-        agent_pos_track.append(agent1.agent_postion())
-        prey_post_track.append(prey.getPosition())
-        predator_pos_track.append(predator.getPosition())
-
-        if agent1.agent_postion() == predator.getPosition():
-            print('Agent Loses :(')
-            state = "OVER"
-
-        if agent1.agent_postion() == prey.getPosition():
-            print('Agent Wins :)')
-            state = "OVER"
-
-    print('Agent Path: ', agent_pos_track)
-    print('Prey Path: ', prey_post_track)
-    print('Predator Path: ', predator_pos_track)
 
 def processArgs():
     print("Number of args: ",str(len(sys.argv)))
@@ -102,10 +72,10 @@ def runGame(args):
 
     prey = Prey(graph)
     predator = Predator(graph)
-    agent1 = Agent1(graph)
+    agent = Agent3(graph)
 
     running = 1
-
+    print(graph.info)
     while True:
         if Environment.getInstance().ui:
             sleep(0.2)
@@ -113,20 +83,38 @@ def runGame(args):
                 if event.type==pygame.QUIT:
                     running =False
         if running==1:
-            agent1.__update__(graph, {
-                'prey' : prey.getPosition(),
-                'predator' : predator.getPosition()
-            })
+            graph.surveyed = False
+
+            info = {}
+            if Environment.getInstance().agent<3:
+                info = {
+                    'prey' : prey.getPosition(),
+                    'predator' : predator.getPosition()
+                }
+            elif Environment.getInstance().agent<5:
+                info = {
+                    'predator' : predator.getPosition()
+                }
+            elif Environment.getInstance().agent<7:
+                info = {
+                    'prey' : prey.getPosition()
+                }
+
+            graph.node_states_blocked= True
+            agent.__update__(graph, info)
+            graph.node_states_blocked = False
+
+
             
-            predator.__update__(graph, {'agent':agent1.getPosition()})
+            predator.__update__(graph, {'agent':agent.getPosition()})
             prey.__update__(graph)
             renderer.__render__(running)
         
-            if agent1.getPosition() == predator.getPosition():
+            if agent.getPosition() == predator.getPosition():
                 print('Agent Loses :(')
                 running = 0
 
-            if agent1.getPosition() == prey.getPosition():
+            if agent.getPosition() == prey.getPosition():
                 print('Agent Wins :)')
                 running = 2
         else:

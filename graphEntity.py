@@ -1,3 +1,4 @@
+from environment import Environment
 from graph import Graph
 
 """
@@ -14,6 +15,8 @@ class GraphEntity:
         self.nextPosition = None
         # Type of the entity to allocate position
         self.type = -1
+        # Node count 
+        self.node_count = Environment.getInstance().node_count
 
     # Called to update the entity in the game loop
     """
@@ -29,8 +32,8 @@ class GraphEntity:
     # Generic move logic
     # DO NOT OVERRIDE
     def move(self, graph : Graph):
-        graph.node_states[self.position][self.type] = False
-        graph.node_states[self.nextPosition][self.type] = True
+        graph.deallocate_pos(self.position,self.type)
+        graph.allocate_pos(self.nextPosition,self.type)
         self.position = self.nextPosition
         pass
     

@@ -1,5 +1,6 @@
 
 
+from environment import Environment
 import random
 # from random import random
 from graph import Graph
@@ -15,7 +16,7 @@ class Prey(GraphEntity):
     def __init__(self, graph : Graph) -> None:
         # Prey Spawn Position
         self.type = 2
-        self.position = random.randint(0,49)
+        self.position = random.randint(0,Environment.getInstance().node_count-1)
 
         # Allocate Node in graph
         graph.allocate_pos(self.position, self.type)
