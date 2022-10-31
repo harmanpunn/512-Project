@@ -34,43 +34,6 @@ allowed_args = {
     "agent":int
 }
 
-def startGame():
-    graph_inst = Graph()
-    
-    graph = graph_inst.generate_graph()
-    # graph = graph_instance.generate_graph()
-    print('graph:',graph)
-
-
-    prey = Prey(graph_inst)
-    predator = Predator(graph_inst)
-    agent : GraphEntity = get_class(Environment.getInstance().agent)(graph_inst)
-
-    state = "RUNNING"
-    agent_pos_track = list()
-    prey_post_track = list()
-    predator_pos_track = list()
-    while state == "RUNNING":
-        agent.__update__(graph, prey, predator)
-        
-        predator.__update__(graph, agent.agent_postion())
-        prey.__update__(graph)
-        agent_pos_track.append(agent.agent_postion())
-        prey_post_track.append(prey.getPosition())
-        predator_pos_track.append(predator.getPosition())
-
-        if agent.agent_postion() == predator.getPosition():
-            print('Agent Loses :(')
-            state = "OVER"
-
-        if agent.agent_postion() == prey.getPosition():
-            print('Agent Wins :)')
-            state = "OVER"
-
-    print('Agent Path: ', agent_pos_track)
-    print('Prey Path: ', prey_post_track)
-    print('Predator Path: ', predator_pos_track)
-
 def processArgs():
     print("Number of args: ",str(len(sys.argv)))
     print("Args: ",str(sys.argv))
@@ -121,13 +84,27 @@ def runGame(args):
                     running =False
         if running==1:
             graph.surveyed = False
-            print("Actual prey position: ",prey.getPosition())
+
+            info = {}
+            if Environment.getInstance().agent<3:
+                info = {
+                    'prey' : prey.getPosition(),
+                    'predator' : predator.getPosition()
+                }
+            elif Environment.getInstance().agent<5:
+                info = {
+                    'predator' : predator.getPosition()
+                }
+            elif Environment.getInstance().agent<7:
+                info = {
+                    'prey' : prey.getPosition()
+                }
+
             graph.node_states_blocked= True
-            agent.__update__(graph, {
-                'prey' : prey.getPosition(),
-                'predator' : predator.getPosition()
-            })
+            agent.__update__(graph, info)
             graph.node_states_blocked = False
+
+
             
             predator.__update__(graph, {'agent':agent.getPosition()})
             prey.__update__(graph)

@@ -1,3 +1,4 @@
+from agents.agent1 import Agent1
 from environment import Environment
 import random
 from graph import Graph
@@ -22,6 +23,24 @@ class Agent3(GraphEntity):
         self.theta = 2
     
     def plan(self, graph: Graph, info):
+        # Spreading prior probabilities
+        for node in range(0, self.node_count):
+            sum = 0.0
+            for pr in range(0, self.node_count):
+                if node in graph.info[pr] or node==pr:
+                    sum += self.belief[pr]/len(graph.info[pr])
+            
+            self.belief[node] = sum
+
+        # Updating the fact that prey is not at current position
+        sum = 0.0
+        for node in range(0,self.node_count):
+            c = self.position in graph.info[node] or self.position==node
+            if c:
+                self.belief[node] *= (len(graph.info[node]))/(len(graph.info[node])+1)
+            sum+= self.belief[node]
+        self.belief = [x/sum for x in self.belief]
+        
         max_val = max(self.belief)
         max_beliefs = [i for i, v in enumerate(self.belief) if v==max_val]
 
@@ -44,16 +63,9 @@ class Agent3(GraphEntity):
             self.belief = [x/sum for x in self.belief]
         else:
             print("Found ya prey!")
-            gamma = (1-self.alpha)/(1+ len(graph.info[survey_node])*self.theta)
-            beta = self.theta * gamma
-            for node in range(0, self.node_count):
-                if node == survey_node:
-                    self.belief[node] = self.alpha
-                elif node in graph.info[survey_node]:
-                    self.belief[node] = beta
-                else:
-                    self.belief[node] = gamma
-                
+            for node in range(0,self.node_count):
+                self.belief[node] = 0.0 if node!=survey_node else 1.0
+        
         max_val = max(self.belief)
         max_beliefs = [i for i, v in enumerate(self.belief) if v==max_val]
 
@@ -65,72 +77,9 @@ class Agent3(GraphEntity):
         print('Agent Pos Curr:', self.position)
         print('Prey Position:', prey)
         print('Predator Position:', predator)
-        
-        curr_agent = self.position
-        agent_shortest_dist_prey = get_shortest_path(graphInfo, curr_agent, prey)
-        # print('agent_shortest_dist_prey:', agent_shortest_dist_prey)
-        agent_shortest_dist_predator = get_shortest_path(graphInfo, curr_agent, predator)
-        # print('agent_shortest_dist_predator:', agent_shortest_dist_predator)
 
-        neighbor_list = graphInfo[self.position]
-        lookup_table = dict()
-        for el in neighbor_list:
-            # Shortest Path to prey
-            path_len_to_prey = get_shortest_path(graphInfo, el, prey)
-            # Shortest Path to predator
-            path_len_to_predator = get_shortest_path(graphInfo, el, predator)
-            # Updating the lookup table
-            lookup_table[el] = [path_len_to_predator, path_len_to_prey]
+        self.nextPosition = Agent1.get_next_position(prey,predator, graphInfo, self.position)
 
-        self.nextPosition = self.get_next_position(lookup_table, agent_shortest_dist_prey, agent_shortest_dist_predator)
-        
-        # self.move(graph)
-
-    def get_next_position(self, lookup_table, agent_shortest_dist_prey, agent_shortest_dist_predator):
-        next_position = self.position
-        order_list = [None]*6
-        for key in lookup_table:
-            # print(key ,'->',lookup_table[key] ) 
-            # Neighbor that is closer to Prey and farther from the Predator.
-            if (lookup_table[key][1] < agent_shortest_dist_prey and  
-                lookup_table[key][0] > agent_shortest_dist_predator):
-                next_position = key
-                order_list.insert(0,key);
-
-            # Neighbors that are closer to the Prey and not closer to the Predator.
-            elif (lookup_table[key][1] < agent_shortest_dist_prey and
-                lookup_table[key][0] == agent_shortest_dist_predator):    
-                next_position = key
-                order_list.insert(1,key);
-
-            # Neighbors that are not farther from the Prey and farther from the Predator.
-            elif (lookup_table[key][1] == agent_shortest_dist_prey and 
-                lookup_table[key][0] > agent_shortest_dist_predator):
-                next_position = key
-                order_list.insert(2,key);
-
-            # Neighbors that are not farther from the Prey and not closer to the Predator.
-            elif (lookup_table[key][1] == agent_shortest_dist_prey and
-                lookup_table[key][0] == agent_shortest_dist_predator):
-                next_position = key
-                order_list.insert(3,key);
-
-            # Neighbors that are farther from the Predator.
-            elif (lookup_table[key][0] > agent_shortest_dist_predator):
-                next_position = key 
-                order_list.insert(4,key);
-
-            # Neighbors that are not closer to the Predator.
-            elif (lookup_table[key][0] == agent_shortest_dist_predator):
-                next_position = key
-                order_list.insert(5,key);
-        
-        ls = [item for item in order_list if item is not None]
-        if len(ls)==0:
-            return self.position
-        # print('order_list:', order_list)
-        # print('first item:', ls[0])
-        return ls[0]
         
 
                     
