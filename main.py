@@ -109,10 +109,10 @@ def runGame(args):
 
     prey = Prey(graph)
     predator = Predator(graph)
-    agent = Agent1(graph)
+    agent = Agent3(graph)
 
     running = 1
-
+    print(graph.info)
     while True:
         if Environment.getInstance().ui:
             sleep(0.2)
@@ -120,10 +120,14 @@ def runGame(args):
                 if event.type==pygame.QUIT:
                     running =False
         if running==1:
+            graph.surveyed = False
+            print("Actual prey position: ",prey.getPosition())
+            graph.node_states_blocked= True
             agent.__update__(graph, {
                 'prey' : prey.getPosition(),
                 'predator' : predator.getPosition()
             })
+            graph.node_states_blocked = False
             
             predator.__update__(graph, {'agent':agent.getPosition()})
             prey.__update__(graph)

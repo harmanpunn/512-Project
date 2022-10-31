@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 
 Singleton class to hold all the environment constants
@@ -21,7 +22,7 @@ class Environment:
     
     # to get the instance of the environment class
     @classmethod
-    def getInstance(cls):
+    def getInstance(cls) -> Environment:
         if len(Environment.instances)==0:
             raise RuntimeError("Environment not initialised!")
         return Environment.instances[0]
