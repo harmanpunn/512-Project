@@ -23,16 +23,8 @@ class Agent3(GraphEntity):
         self.theta = 2
     
     def plan(self, graph: Graph, info):
-        # Spreading prior probabilities
-        for node in range(0, self.node_count):
-            sum = 0.0
-            for pr in range(0, self.node_count):
-                if node in graph.info[pr] or node==pr:
-                    sum += self.belief[pr]/len(graph.info[pr])
-            
-            self.belief[node] = sum
-
-        # Updating the fact that prey is not at current position
+        print("Spread Possibilities: ",self.belief)
+        # Updating priors with the fact that prey is not at current position
         sum = 0.0
         for node in range(0,self.node_count):
             c = self.position in graph.info[node] or self.position==node
@@ -47,6 +39,8 @@ class Agent3(GraphEntity):
         survey_node = random.choice(max_beliefs)
         survey_res = graph.survey(survey_node)
         print("Surveying : ",survey_node)
+
+        # Updating Priors with fact that prey not at survey location
         if not survey_res:
             sum = 0.0
             print("No prey ;_;")
@@ -66,10 +60,20 @@ class Agent3(GraphEntity):
             for node in range(0,self.node_count):
                 self.belief[node] = 0.0 if node!=survey_node else 1.0
         
+        # Spreading prior probabilities
+        for node in range(0, self.node_count):
+            sum = 0.0
+            for pr in range(0, self.node_count):
+                if node in graph.info[pr] or node==pr:
+                    sum += self.belief[pr]/len(graph.info[pr])
+            
+            self.belief[node] = sum
+
         max_val = max(self.belief)
         max_beliefs = [i for i, v in enumerate(self.belief) if v==max_val]
 
         prey = random.choice(max_beliefs)
+        Environment.getInstance().expected_prey = max_beliefs
         predator = info['predator']
         graphInfo = graph.info
         # neighbor_list = graph[self.position]

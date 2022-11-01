@@ -22,11 +22,13 @@ class Renderer:
         self.node_count = Environment.getInstance().node_count
         self.node_colors = []
         self.node_centers = []
+        self.debug_centers = []
         center  = (self.screenSize[0]/2,self.screenSize[1]/2)
 
         for i in range(0,self.node_count):
             self.node_colors.append(random.choices(range(256), k=3))
             self.node_centers.append((center[0]+ 200*math.cos(2*i*math.pi/self.node_count),center[1]+ 200*math.sin(2*i*math.pi/self.node_count)))
+            self.debug_centers.append((center[0]+ 220*math.cos(2*i*math.pi/self.node_count),center[1]+ 220*math.sin(2*i*math.pi/self.node_count)))
         
         self.graph_info = graph.info
         self.node_states = graph.node_states
@@ -99,6 +101,9 @@ class Renderer:
                 
                 # print(tileState)
                 self.surface.blit(img,((self.node_centers[i][0]-16,self.node_centers[i][1]-16)))
+            
+            if i in Environment.getInstance().expected_prey:
+                pygame.draw.circle(self.surface, (0,0,0), self.debug_centers[i] , 5)
         # center  = (self.screenSize[0]/2,self.screenSize[1]/2)
         # p1 = self.node_centers[0]
         # p2 = self.node_centers[1]
