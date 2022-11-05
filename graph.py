@@ -82,6 +82,9 @@ class Graph:
         if not self.surveyed:
             # Surveyed for the first time
             self.surveyed = True
-            return self._node_states[x][2]
+            if Environment.getInstance().agent<5:
+                return self._node_states[x][2]
+            elif Environment.getInstance().agent<7:
+                return self._node_states[x][1]
         else:
             raise AttributeError("Surveying Multiple times!")

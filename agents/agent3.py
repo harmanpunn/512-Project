@@ -45,13 +45,9 @@ class Agent3(GraphEntity):
             sum = 0.0
             print("No prey ;_;")
             for node in range(0,self.node_count):
-                c = self.position in graph.info[node] or self.position==node
                 s = survey_node in graph.info[node] or survey_node==node
-                if ( c and not s) or (s and not c):
+                if s:
                     self.belief[node] *= (len(graph.info[node]))/(len(graph.info[node])+1)
-                elif c and s:
-                    self.belief[node] *= (len(graph.info[node])-1)/(len(graph.info[node])+1)
-                
                 sum+= self.belief[node]
             
             self.belief = [x/sum for x in self.belief]
@@ -65,7 +61,7 @@ class Agent3(GraphEntity):
             sum = 0.0
             for pr in range(0, self.node_count):
                 if node in graph.info[pr] or node==pr:
-                    sum += self.belief[pr]/len(graph.info[pr])
+                    sum += self.belief[pr]/(len(graph.info[pr])+1)
             
             self.belief[node] = sum
 
@@ -79,7 +75,7 @@ class Agent3(GraphEntity):
         # neighbor_list = graph[self.position]
         print("New Beliefs : ", self.belief)
         print('Agent Pos Curr:', self.position)
-        print('Prey Position:', prey)
+        print('Expected Prey Position:', prey)
         print('Predator Position:', predator)
 
         self.nextPosition = Agent1.get_next_position(prey,predator, graphInfo, self.position)
