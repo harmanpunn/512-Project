@@ -102,7 +102,7 @@ class Renderer:
                 # print(tileState)
                 self.surface.blit(img,((self.node_centers[i][0]-16,self.node_centers[i][1]-16)))
             
-            if i in Environment.getInstance().expected_prey:
+            if Environment.getInstance().expected_prey!=-1 and i in Environment.getInstance().expected_prey:
                 pygame.draw.circle(self.surface, (0,0,0), self.debug_centers[i] , 5)
         # center  = (self.screenSize[0]/2,self.screenSize[1]/2)
         # p1 = self.node_centers[0]

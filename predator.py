@@ -24,15 +24,13 @@ class Predator(GraphEntity):
         
         agent_position = info['agent']
         graphInfo = graph.info
-        min_len = 999
-        next_position = self.position
+        
         neighbor_list = graphInfo[self.position]
-        for el in neighbor_list:
-            path_len_to_agent = get_shortest_path(graphInfo, el, agent_position)
-            if path_len_to_agent < min_len:
-                next_position = el
-                min_len = path_len_to_agent
-                
+        dsts = [get_shortest_path(graphInfo, el, agent_position) for el in neighbor_list]
+        min_len = min(dsts)
+
+        equal_dsts = [neighbor_list[i] for i in range(0,len(neighbor_list)) if dsts[i]==min_len  ]
+        next_position = random.choice(equal_dsts)                
 
         '''
         src = self.position
