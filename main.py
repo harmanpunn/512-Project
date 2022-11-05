@@ -73,7 +73,7 @@ def runGame(args):
 
     prey = Prey(graph)
     predator = Predator(graph)
-    agent = get_class("Agent"+str(Environment.getInstance().agent))(graph)
+    agent : GraphEntity = get_class("Agent"+str(Environment.getInstance().agent))(graph)
 
     running = 1
     print(graph.info)
@@ -104,24 +104,23 @@ def runGame(args):
                 if first_step:
                     info["predator"] = predator.getPosition()
                     first_step = False
+
             graph.node_states_blocked= True
             print(info)
             agent.__update__(graph, info)
             graph.node_states_blocked = False
 
-
-            
             predator.__update__(graph, {'agent':agent.getPosition()})
             prey.__update__(graph)
             renderer.__render__(running)
         
+            if agent.getPosition() == prey.getPosition():
+                print('Agent Wins :)')
+                running = 2
             if agent.getPosition() == predator.getPosition():
                 print('Agent Loses :(')
                 running = 0
 
-            if agent.getPosition() == prey.getPosition():
-                print('Agent Wins :)')
-                running = 2
         else:
             if Environment.getInstance().ui:
                 renderer.__render__(running)
