@@ -1,6 +1,7 @@
 import sys
 import os
 from time import sleep
+import pandas as pd
 
 from graphEntity import GraphEntity
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
@@ -60,19 +61,18 @@ def processArgs():
         return args    
     return {}
 
-def runGame(args):
-    env = Environment(True,50)
-    for x in args.keys():
-        setattr(env,x,args[x]) 
 
-    graph = Graph()
+def runGame(graph : Graph):
+
+    # graph = Graph()
     renderer =  Renderer(graph)
     # print("Initialized")
     # startGame()
-
+    step_count = 0
+    game_state = -2
     prey = Prey(graph)
     predator = Predator(graph)
-    agent = Agent3(graph)
+    agent = get_class('Agent'+str(Environment.getInstance().agent))(graph)
 
     running = 1
     print(graph.info)
@@ -103,32 +103,81 @@ def runGame(args):
             graph.node_states_blocked= True
             agent.__update__(graph, info)
             graph.node_states_blocked = False
-
-
             
             predator.__update__(graph, {'agent':agent.getPosition()})
             prey.__update__(graph)
             renderer.__render__(running)
-        
-            if agent.getPosition() == predator.getPosition():
-                print('Agent Loses :(')
-                running = 0
-
+           
             if agent.getPosition() == prey.getPosition():
                 print('Agent Wins :)')
                 running = 2
+                # Agent catches its prey
+                game_state = 1
+
+            if agent.getPosition() == predator.getPosition():
+                print('Agent Loses :(')
+                running = 0
+                # Agent caught by predator
+                game_state = 0
+
+            if step_count > 200:
+                running = 0
+                # Timeout
+                game_state = -1 
+
         else:
             if Environment.getInstance().ui:
                 renderer.__render__(running)
                 sleep(4)
             break
-
+        step_count+=1
+    graph.reset_states()    
     
     if Environment.getInstance().ui:
         pygame.quit()
+    return [step_count, game_state]    
+
+def collectData() -> None:
+    graph = Graph()
+    stats_dict = dict()
+    step_count_list = list()
+    game_state_list = list()
+    type_list = list()
+    for i in range(1,100):
+        type = i
+        for _ in range(0,30):
+            [step_count, game_state] = runGame(graph) 
+            step_count_list.append(step_count)
+            game_state_list.append(game_state)
+            type_list.append(type)
+        
+
+    stats_dict = {'graph_type': type_list, 'step_count': step_count_list, 'game_count' : game_state_list}
+    '''    
+    stats_dict['graph_type'] = 1
+    stats_dict['step_count'] = step_count
+    stats_dict['game_state'] = game_state
+    '''
+    # print(stats_dict) 
+    # stats_df = pd.DataFrame(columns=['Graph Type', 'Step Count', 'Game State'])
+    # stats_df.loc[len(stats_df.index)] = []
+    # stats_df.loc[len()]
+    stats_df = pd.DataFrame(data = stats_dict)
+    stats_df.to_csv('Agent'+str(Environment.getInstance().agent)+'.csv', index=False)
+    pass
+
 
 if __name__ == "__main__":
     args = processArgs()
+    env = Environment(True,50)
+    for x in args.keys():
+        setattr(env,x,args[x]) 
     if 'mode' in args.keys() and args['mode']==1:
         print("Mode different")
-    runGame(args)
+        Environment.getInstance().ui = False
+        collectData()
+    else:
+        graph = Graph()
+        runGame(graph)
+
+
