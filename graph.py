@@ -32,6 +32,10 @@ class Graph:
         else:
             return self._node_states
 
+    def reset_states(self):
+        for i in range(0,Environment.getInstance().node_count):
+            self._node_states[i] = [False, False, False]
+
     def generate_graph(self):
         graph = defaultdict(list)
         trial = 0
