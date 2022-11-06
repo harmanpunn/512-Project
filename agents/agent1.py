@@ -38,14 +38,27 @@ class Agent1(GraphEntity):
 
         neighbor_list = graphInfo[curr_agent]
         lookup_table = dict()
+        min_neighbor_dist_to_prey = 9999
+        min_list = list()
         for el in neighbor_list:
             # Shortest Path to prey
             path_len_to_prey = get_shortest_path(graphInfo, el, prey)
+            min_list.append(path_len_to_prey)
             # Shortest Path to predator
             path_len_to_predator = get_shortest_path(graphInfo, el, predator)
             # Updating the lookup table
             lookup_table[el] = [path_len_to_predator, path_len_to_prey]
+
+        print('curr_agent_pos:',curr_agent)
+        print('lookup_table: ', lookup_table)    
         
+        if Environment.getInstance().careful and agent_shortest_dist_predator >= 5:
+            mn = min(min_list)
+            possible_moves = [neighbor_list[i] for i in range(0,len(neighbor_list)) if min_list[i]==mn]
+            print('No worries! Predator is too far way!')
+            return random.choice(possible_moves)
+            
+        print("RUNNNNNNN!")
         order_list = [None]*6
         for key in lookup_table:
             print(key ,'->',lookup_table[key] ) 
@@ -80,6 +93,6 @@ class Agent1(GraphEntity):
         ls = [item for item in order_list if item is not None]
         if len(ls)==0:
             return curr_agent
-        print('order_list:', order_list)
-        print('first item:', ls[0])
+        # print('order_list:', order_list)
+        # print('first item:', ls[0])
         return ls[0]

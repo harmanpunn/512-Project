@@ -74,7 +74,20 @@ def runGame(graph : Graph):
     game_state = -2
     prey = Prey(graph)
     predator = Predator(graph)
-    agent : GraphEntity = get_class("Agent"+str(Environment.getInstance().agent))(graph)
+
+    if Environment.getInstance().agent % 2 == 0:
+        Environment.getInstance().careful = True
+
+    if Environment.getInstance().agent < 3:
+        agent : GraphEntity = Agent1(graph)
+    elif Environment.getInstance().agent < 5:
+        agent : GraphEntity = Agent3(graph) 
+    elif Environment.getInstance().agent < 7:
+        agent : GraphEntity = Agent5(graph) 
+    elif Environment.getInstance().agent < 9:
+        agent : GraphEntity = Agent7(graph)         
+
+        # agent : GraphEntity = get_class("Agent"+str(Environment.getInstance().agent))(graph)
 
     running = 1
     print(graph.info)
@@ -163,6 +176,20 @@ def collectData() -> None:
         
 
     stats_dict = {'graph_type': type_list, 'step_count': step_count_list, 'game_count' : game_state_list}
+
+    win_count = game_state_list.count(1)
+    lose_count = game_state_list.count(0)
+    timeout_count = game_state_list.count(-1)
+
+    
+    print("========== GAME STATS ==========")
+    print("Win Count: ",win_count)
+    print("Win %: ", (win_count/3000) * 100)
+    print("Lose Count: ",lose_count)
+    print("Lose %: ", (lose_count/3000) * 100)
+    print("Timeout Count: ",timeout_count)
+    print("Timeout %: ", (timeout_count/3000) * 100)
+    print("================================")
     '''    
     stats_dict['graph_type'] = 1
     stats_dict['step_count'] = step_count
@@ -172,8 +199,8 @@ def collectData() -> None:
     # stats_df = pd.DataFrame(columns=['Graph Type', 'Step Count', 'Game State'])
     # stats_df.loc[len(stats_df.index)] = []
     # stats_df.loc[len()]
-    stats_df = pd.DataFrame(data = stats_dict)
-    stats_df.to_csv('Agent'+str(Environment.getInstance().agent)+'.csv', index=False)
+    # stats_df = pd.DataFrame(data = stats_dict)
+    # stats_df.to_csv('Agent'+str(Environment.getInstance().agent)+'.csv', index=False)
     pass
 
 
