@@ -7,6 +7,7 @@ from environment import Environment
 
 class Agent1(GraphEntity):
     def __init__(self, graph : Graph) -> None:
+        super().__init__()
         self.type = 1
         while True:
             self.position = random.randint(0,Environment.getInstance().node_count-1)

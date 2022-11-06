@@ -7,13 +7,14 @@ from util import get_shortest_path
 
 class Agent3(GraphEntity):
     def __init__(self, graph : Graph) -> None:
+        super().__init__()
         self.type = 1
         while True:
             self.position = random.randint(0,Environment.getInstance().node_count-1)
             if not graph.node_states[self.position][0] and not graph.node_states[self.position][2]:
                 break
         
-        self.node_count = Environment.getInstance().node_count
+        # self.node_count = Environment.getInstance().node_count
         # allocating position in the graph
         graph.allocate_pos(self.position,self.type)
 
@@ -37,7 +38,7 @@ class Agent3(GraphEntity):
         max_beliefs = [i for i, v in enumerate(self.belief) if v==max_val]
 
         survey_node = random.choice(max_beliefs)
-        survey_res = graph.survey(survey_node)
+        survey_res = graph.survey(survey_node)[2]
         print("Surveying : ",survey_node)
 
         # Updating Priors with fact that prey not at survey location

@@ -32,9 +32,10 @@ class GraphEntity:
     # Generic move logic
     # DO NOT OVERRIDE
     def move(self, graph : Graph):
-        graph.deallocate_pos(self.position,self.type)
-        graph.allocate_pos(self.nextPosition,self.type)
-        self.position = self.nextPosition
+        if self.nextPosition!=None:
+            graph.deallocate_pos(self.position,self.type)
+            graph.allocate_pos(self.nextPosition,self.type)
+            self.position = self.nextPosition
         pass
     
     # Implements the core logic of the entity
