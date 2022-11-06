@@ -34,9 +34,9 @@ class Agent3(GraphEntity):
             sum+= self.belief[node]
         self.belief = [x/sum for x in self.belief]
         
+        # Pick max belief node to survey
         max_val = max(self.belief)
         max_beliefs = [i for i, v in enumerate(self.belief) if v==max_val]
-
         survey_node = random.choice(max_beliefs)
         survey_res = graph.survey(survey_node)[2]
         print("Surveying : ",survey_node)
@@ -57,7 +57,14 @@ class Agent3(GraphEntity):
             for node in range(0,self.node_count):
                 self.belief[node] = 0.0 if node!=survey_node else 1.0
         
-        # Spreading prior probabilities
+        # Selecting next move
+        max_val = max(self.belief)
+        max_beliefs = [i for i, v in enumerate(self.belief) if v==max_val]
+
+        prey = random.choice(max_beliefs)
+        Environment.getInstance().expected_prey = max_beliefs
+
+        # Transitioning prior probabilities
         for node in range(0, self.node_count):
             sum = 0.0
             for pr in range(0, self.node_count):
@@ -66,11 +73,6 @@ class Agent3(GraphEntity):
             
             self.belief[node] = sum
 
-        max_val = max(self.belief)
-        max_beliefs = [i for i, v in enumerate(self.belief) if v==max_val]
-
-        prey = random.choice(max_beliefs)
-        Environment.getInstance().expected_prey = max_beliefs
         predator = info['predator']
         graphInfo = graph.info
         # neighbor_list = graph[self.position]

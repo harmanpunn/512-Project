@@ -47,6 +47,16 @@ class Agent5(GraphEntity):
         max_beliefs = [i for i, v in enumerate(self.belief) if v==max_val]
         Environment.getInstance().expected_predator = max_beliefs
         predator = random.choice(max_beliefs)
+
+        # Transitioning priors
+        for node in range(0, self.node_count):
+            sum = 0.0
+            for pr in range(0, self.node_count):
+                if node in graph.info[pr] or node==pr:
+                    sum += self.belief[pr]*(0.4/(len(graph.info[pr])+1) + 0.6*(1.0/len(close_nodes[pr]) if node in close_nodes[pr] else 0.0))
+            
+            self.belief[node] = sum
+
         prey = info['prey']
         # neighbor_list = graph[self.position]
         print("New Beliefs : ", self.belief)
@@ -94,14 +104,6 @@ class Agent5(GraphEntity):
             print("Found predator! RUNN!")
             for node in range(0,self.node_count):
                 self.belief[node] = 0.0 if node!=survey_node else 1.0
-        
-        for node in range(0, self.node_count):
-            sum = 0.0
-            for pr in range(0, self.node_count):
-                if node in graph.info[pr] or node==pr:
-                    sum += self.belief[pr]*(0.4/(len(graph.info[pr])+1) + 0.6*(1.0/len(close_nodes[pr]) if node in close_nodes[pr] else 0.0))
-            
-            self.belief[node] = sum
 
                     
                 
