@@ -18,6 +18,7 @@ class Environment:
             self.agent = 1
             self.expected_prey = -1
             self.expected_predator = -1
+            self.careful = False
             Environment.instances.append(self)
         else:
             raise RuntimeError("Initialising Environment multiple times!")
