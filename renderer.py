@@ -104,6 +104,9 @@ class Renderer:
             
             if Environment.getInstance().expected_prey!=-1 and i in Environment.getInstance().expected_prey:
                 pygame.draw.circle(self.surface, (0,0,0), self.debug_centers[i] , 5)
+            
+            if Environment.getInstance().expected_predator!=-1 and i in Environment.getInstance().expected_predator:
+                pygame.draw.circle(self.surface, (255,0,0), self.debug_centers[i] , 5)
         # center  = (self.screenSize[0]/2,self.screenSize[1]/2)
         # p1 = self.node_centers[0]
         # p2 = self.node_centers[1]

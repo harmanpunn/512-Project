@@ -7,13 +7,14 @@ from util import get_shortest_path
 
 class Agent5(GraphEntity):
     def __init__(self, graph : Graph) -> None:
+        super().__init__()
         self.type = 1
         while True:
             self.position = random.randint(0,Environment.getInstance().node_count-1)
             if not graph.node_states[self.position][0] and not graph.node_states[self.position][2]:
                 break
         
-        self.node_count = Environment.getInstance().node_count
+        # self.node_count = Environment.getInstance().node_count
         # allocating position in the graph
         graph.allocate_pos(self.position,self.type)
 
@@ -41,19 +42,11 @@ class Agent5(GraphEntity):
         else:
             self.survey_and_update_beliefs(graph,close_nodes)                   
             # Spreading prior probabilities
-            for node in range(0, self.node_count):
-                sum = 0.0
-                for pr in range(0, self.node_count):
-                    if node in graph.info[pr] or node==pr:
-                        sum += self.belief[pr]*(0.4/(len(graph.info[pr])+1) + 0.6*(1.0/len(close_nodes[pr]) if node in close_nodes[pr] else 0.0))
-                
-                self.belief[node] = sum
-
+            
         max_val = max(self.belief)
         max_beliefs = [i for i, v in enumerate(self.belief) if v==max_val]
-
+        Environment.getInstance().expected_predator = max_beliefs
         predator = random.choice(max_beliefs)
-        Environment.getInstance().expected_prey = max_beliefs
         prey = info['prey']
         # neighbor_list = graph[self.position]
         print("New Beliefs : ", self.belief)
@@ -81,7 +74,7 @@ class Agent5(GraphEntity):
         max_beliefs = [i for i, v in enumerate(self.belief) if v==max_val]
 
         survey_node = random.choice(max_beliefs)
-        survey_res = graph.survey(survey_node)
+        survey_res = graph.survey(survey_node)[0]
         print("Surveying : ",survey_node)
 
         # Updating Priors with fact that predator not at survey location
@@ -102,6 +95,14 @@ class Agent5(GraphEntity):
             for node in range(0,self.node_count):
                 self.belief[node] = 0.0 if node!=survey_node else 1.0
         
+        for node in range(0, self.node_count):
+            sum = 0.0
+            for pr in range(0, self.node_count):
+                if node in graph.info[pr] or node==pr:
+                    sum += self.belief[pr]*(0.4/(len(graph.info[pr])+1) + 0.6*(1.0/len(close_nodes[pr]) if node in close_nodes[pr] else 0.0))
+            
+            self.belief[node] = sum
+
                     
                 
 

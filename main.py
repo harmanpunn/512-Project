@@ -14,6 +14,7 @@ import pygame
 from agents.agent1 import Agent1
 from agents.agent3 import Agent3
 from agents.agent5 import Agent5
+from agents.agent7 import Agent7
 
 from predator import Predator
 from prey import Prey
@@ -104,9 +105,12 @@ def runGame(graph : Graph):
                 if first_step:
                     info["predator"] = predator.getPosition()
                     first_step = False
+            else:
+                if first_step:
+                    info["predator"] = predator.getPosition()
+                    first_step = False
 
             graph.node_states_blocked= True
-            print(info)
             agent.__update__(graph, info)
             graph.node_states_blocked = False
             
