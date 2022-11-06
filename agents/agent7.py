@@ -117,8 +117,20 @@ class Agent7(GraphEntity):
             print("Found predator! RUNN!")
             for node in range(0,self.node_count):
                 self.predator_belief[node] = 0.0 if node!=survey_node else 1.0
-        
 
+        # Picking predator & prey positions        
+        max_val = max(self.predator_belief)
+        max_beliefs = [i for i, v in enumerate(self.predator_belief) if v==max_val]
+        Environment.getInstance().expected_predator =  deepcopy(max_beliefs)
+        predator = random.choice(max_beliefs)
+        
+        max_val = max(self.prey_belief)
+        max_beliefs = [i for i, v in enumerate(self.prey_belief) if v==max_val]
+        Environment.getInstance().expected_prey =  deepcopy(max_beliefs)
+        prey = random.choice(max_beliefs)
+
+
+        # Transitioning priors 
         for node in range(0, self.node_count):
             sum = 0.0
             for pr in range(0, self.node_count):
@@ -133,19 +145,9 @@ class Agent7(GraphEntity):
                 if node in graph.info[pr] or node==pr:
                     sum += self.prey_belief[pr]/(len(graph.info[pr])+1)
             
-            self.prey_belief[node] = sum
+            self .prey_belief[node] = sum
         
         
-        max_val = max(self.predator_belief)
-        max_beliefs = [i for i, v in enumerate(self.predator_belief) if v==max_val]
-        Environment.getInstance().expected_predator =  deepcopy(max_beliefs)
-        predator = random.choice(max_beliefs)
-        
-        max_val = max(self.prey_belief)
-        max_beliefs = [i for i, v in enumerate(self.prey_belief) if v==max_val]
-        Environment.getInstance().expected_prey =  deepcopy(max_beliefs)
-        prey = random.choice(max_beliefs)
-
         print('Agent Pos Curr:', self.position)
         print('Expected Prey Position:', prey)
         print('Expected Predator Position:', predator)
