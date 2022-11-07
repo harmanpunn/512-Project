@@ -24,7 +24,6 @@ class Agent3(GraphEntity):
         self.theta = 2
     
     def plan(self, graph: Graph, info):
-        print("Spread Possibilities: ",self.belief)
         # Updating priors with the fact that prey is not at current position
         sum = 0.0
         for node in range(0,self.node_count):
