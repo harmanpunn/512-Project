@@ -195,11 +195,11 @@ def collectData() -> None:
 
     print("========== GAME STATS ==========")
     print("Win Count: ",win_count)
-    print("Win %: ", (win_count/3000) * 100)
+    print("Win %: ", (win_count/10000) * 100)
     print("Lose Count: ",lose_count)
-    print("Lose %: ", (lose_count/3000) * 100)
+    print("Lose %: ", (lose_count/10000) * 100)
     print("Timeout Count: ",timeout_count)
-    print("Timeout %: ", (timeout_count/3000) * 100)
+    print("Timeout %: ", (timeout_count/10000) * 100)
     print("================================")
     '''    
     stats_dict['graph_type'] = 1

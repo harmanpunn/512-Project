@@ -54,48 +54,54 @@ class Agent1(GraphEntity):
 
         print('curr_agent_pos:',curr_agent)
         print('lookup_table: ', lookup_table)    
-        
-        if Environment.getInstance().careful and agent_shortest_dist_predator >= 5:
-            mn = min(min_list)
-            possible_moves = [neighbor_list[i] for i in range(0,len(neighbor_list)) if min_list[i]==mn]
-            print('No worries! Predator is too far way!')
-            return random.choice(possible_moves)
+
             
         print("RUNNNNNNN!")
-        order_list = [None]*6
+        order_list = [[]]*6
+        close_to_prey = []
         for key in lookup_table:
-            print(key ,'->',lookup_table[key] ) 
+            # print(key ,'->',lookup_table[key] ) 
             # Neighbor that is closer to Prey and farther from the Predator.
             if (lookup_table[key][1] < agent_shortest_dist_prey and  
                 lookup_table[key][0] > agent_shortest_dist_predator):
-                order_list.insert(0,key);
+                order_list[0].append(key)
 
             # Neighbors that are closer to the Prey and not closer to the Predator.
-            elif (lookup_table[key][1] < agent_shortest_dist_prey and
+            if (lookup_table[key][1] < agent_shortest_dist_prey and
                 lookup_table[key][0] == agent_shortest_dist_predator):    
-                order_list.insert(1,key);
+                order_list[1].append(key)
 
             # Neighbors that are not farther from the Prey and farther from the Predator.
-            elif (lookup_table[key][1] == agent_shortest_dist_prey and 
+            if (lookup_table[key][1] == agent_shortest_dist_prey and 
                 lookup_table[key][0] > agent_shortest_dist_predator):
-                order_list.insert(2,key);
+                order_list[2].append(key)
 
             # Neighbors that are not farther from the Prey and not closer to the Predator.
-            elif (lookup_table[key][1] == agent_shortest_dist_prey and
+            if (lookup_table[key][1] == agent_shortest_dist_prey and
                 lookup_table[key][0] == agent_shortest_dist_predator):
-                order_list.insert(3,key);
+                order_list[3].append(key)
 
             # Neighbors that are farther from the Predator.
-            elif (lookup_table[key][0] > agent_shortest_dist_predator):
-                order_list.insert(4,key);
+            if (lookup_table[key][0] > agent_shortest_dist_predator):
+                order_list[4].append(key)
 
             # Neighbors that are not closer to the Predator.
-            elif (lookup_table[key][0] == agent_shortest_dist_predator):
-                order_list.insert(5,key);
+            if (lookup_table[key][0] == agent_shortest_dist_predator):
+                order_list[5].append(key)
+
+            if (lookup_table[key][1] <= agent_shortest_dist_prey):
+                close_to_prey.append(key)
         
-        ls = [item for item in order_list if item is not None]
+        if Environment.getInstance().careful:
+            if agent_shortest_dist_predator <=5:
+                return random.choice(order_list[4])
+            else:
+                return random.choice(close_to_prey)
+
+        print(order_list)
+        ls = [item for item in order_list if len(item)!=0]
         if len(ls)==0:
             return curr_agent
         # print('order_list:', order_list)
         # print('first item:', ls[0])
-        return ls[0]
+        return random.choice(ls[0])
