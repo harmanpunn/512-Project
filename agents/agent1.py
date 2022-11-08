@@ -32,9 +32,7 @@ class Agent1(GraphEntity):
         # self.move(graph)
 
     @staticmethod
-    def get_next_position(prey, predator, graphInfo, curr_agent, silent = True):
-        if silent:
-            sys.stdout = open(os.devnull, 'w')
+    def get_next_position(prey, predator, graphInfo, curr_agent):
     
         agent_shortest_dist_prey = get_shortest_path(graphInfo, curr_agent, prey)
         print('agent_shortest_dist_prey:', agent_shortest_dist_prey)
@@ -96,8 +94,6 @@ class Agent1(GraphEntity):
                 order_list.insert(5,key);
         
         ls = [item for item in order_list if item is not None]
-        if silent:
-            sys.stdout = sys.__stdout__
         if len(ls)==0:
             return curr_agent
         # print('order_list:', order_list)

@@ -9,6 +9,7 @@ os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 from environment import Environment
 from graph import Graph
 from renderer import Renderer
+from tqdm import tqdm
 import pygame
 
 from agents.agent1 import Agent1
@@ -35,7 +36,8 @@ allowed_args = {
     "node_count":int,
     "mode":int,
     "agent":int,
-    "noisy":str2bool
+    "noisy":str2bool,
+    "quiet":str2bool
 }
 
 def processArgs():
@@ -102,7 +104,7 @@ def runGame(graph : Graph):
 
     while True:
         if Environment.getInstance().ui:
-            sleep(0.2)
+            sleep(1)
             for event in pygame.event.get():
                 if event.type==pygame.QUIT:
                     running =False
@@ -169,14 +171,15 @@ def runGame(graph : Graph):
     return [step_count, game_state]    
 
 def collectData() -> None:
+    
     graph = Graph()
     stats_dict = dict()
     step_count_list = list()
     game_state_list = list()
     type_list = list()
-    for i in range(1,100):
+    for i in  tqdm(range(1,100)):
         type = i
-        for _ in range(0,30):
+        for _ in tqdm(range(0,30),leave=False):
             [step_count, game_state] = runGame(graph) 
             step_count_list.append(step_count)
             game_state_list.append(game_state)
@@ -189,7 +192,7 @@ def collectData() -> None:
     lose_count = game_state_list.count(0)
     timeout_count = game_state_list.count(-1)
 
-    
+
     print("========== GAME STATS ==========")
     print("Win Count: ",win_count)
     print("Win %: ", (win_count/3000) * 100)
@@ -217,6 +220,9 @@ if __name__ == "__main__":
     env = Environment(True,50)
     for x in args.keys():
         setattr(env,x,args[x]) 
+    
+    if Environment.getInstance().quiet==True or 'mode' in args.keys() and args['mode']==1:
+        sys.stdout = open(os.devnull, 'w')
     if 'mode' in args.keys() and args['mode']==1:
         print("Mode different")
         Environment.getInstance().ui = False

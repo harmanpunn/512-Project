@@ -80,8 +80,10 @@ class Agent5(GraphEntity):
             sum+= self.belief[node]
         self.belief = [x/sum for x in self.belief]
         
-        max_val = max(self.belief)
-        max_beliefs = [i for i, v in enumerate(self.belief) if v==max_val]
+        neigh_beliefs = [self.belief[x] for x in graph.info[self.position]]
+        print("Neigbors: ",graph.info[self.position])
+        max_val = max(neigh_beliefs)
+        max_beliefs = [graph.info[self.position][i] for i, v in enumerate(neigh_beliefs) if v==max_val]
 
         survey_node = random.choice(max_beliefs)
         survey_res = graph.survey(survey_node)[0]
