@@ -93,6 +93,7 @@ class Graph:
                         print(i," : ",p)
                         if p>0.9:
                             t[i] = False
+                return t
             # if Environment.getInstance().agent<5:
             #     return self._node_states[x][2]
             # elif Environment.getInstance().agent<7:

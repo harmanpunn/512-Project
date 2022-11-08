@@ -34,7 +34,8 @@ allowed_args = {
     "ui":str2bool,
     "node_count":int,
     "mode":int,
-    "agent":int
+    "agent":int,
+    "noisy":str2bool
 }
 
 def processArgs():
@@ -92,6 +93,13 @@ def runGame(graph : Graph):
     running = 1
     print(graph.info)
     first_step = True
+
+    if Environment.getInstance().noisy:
+        print("So NOISY!")
+    
+    if Environment.getInstance().careful:
+        print("TipToe B)")
+
     while True:
         if Environment.getInstance().ui:
             sleep(0.2)
