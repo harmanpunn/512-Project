@@ -3,6 +3,7 @@ from collections import defaultdict
 import random
 from random import choice
 from time import sleep
+from copy import deepcopy
 
 from environment import Environment
 
@@ -82,7 +83,16 @@ class Graph:
         if not self.surveyed:
             # Surveyed for the first time
             self.surveyed = True
-            return self._node_states[x]
+            if not Environment.getInstance().noisy:
+                return self._node_states[x]
+            else:
+                t = deepcopy(self._node_states[x])
+                for i in range(0,len(t)):
+                    if t[i]:
+                        p = random.random()
+                        print(i," : ",p)
+                        if p>0.9:
+                            t[i] = False
             # if Environment.getInstance().agent<5:
             #     return self._node_states[x][2]
             # elif Environment.getInstance().agent<7:
