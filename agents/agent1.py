@@ -57,7 +57,7 @@ class Agent1(GraphEntity):
 
             
         print("RUNNNNNNN!")
-        order_list = [[]]*6
+        order_list = [[] for _ in range(0,6)]
         close_to_prey = []
         for key in lookup_table:
             # print(key ,'->',lookup_table[key] ) 
@@ -93,15 +93,13 @@ class Agent1(GraphEntity):
                 close_to_prey.append(key)
         
         if Environment.getInstance().careful:
-            if agent_shortest_dist_predator <=5:
+            if agent_shortest_dist_predator <=10:
                 if len(order_list[4])!=0:
                     return random.choice(order_list[4])
                 elif len(order_list[5])!=0:
                     return random.choice(order_list[5])
                 else:
                     return curr_agent
-            else:
-                return random.choice(close_to_prey)
 
         print(order_list)
         ls = [item for item in order_list if len(item)!=0]
