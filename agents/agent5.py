@@ -4,6 +4,7 @@ import random
 from graph import Graph
 from graphEntity import GraphEntity
 from util import get_shortest_path
+from collections import deque
 
 class Agent5(GraphEntity):
     def __init__(self, graph : Graph) -> None:
@@ -63,8 +64,35 @@ class Agent5(GraphEntity):
         print('Agent Pos Curr:', self.position)
         print('Prey Position:', prey)
         print('Expected Predator Position:', predator)
-
+        if Environment.getInstance().agent %2==0:
+            p = self.get_max_belief_in_neigh(graph,1)
+            print(p)
+            Environment.getInstance().careful = p > 0.1
+            if Environment.getInstance().careful:
+                print("Extra Careful !!!!!!   ",str(p),"   !!!!!!!! ")
         self.nextPosition = Agent1.get_next_position(prey,predator, graphInfo, self.position)
+
+    def get_max_belief_in_neigh(self, graph:Graph, range:int):
+        fringe = deque()
+
+        fringe.append(self.position)
+        closed_set = {}
+        steps = 0
+
+        mx = float("-inf")
+
+        while len(fringe)!=0 and steps<=range:
+            steps+=1
+            top = fringe.pop()
+
+            closed_set[top] = True
+
+            for x in graph.info[top]:
+                if x not in closed_set or not closed_set[x]:
+                    fringe.append(x)
+                    mx = max(mx, self.belief[x])
+
+        return mx
 
     def survey_and_update_beliefs(self,graph:Graph, close_nodes): 
         # Updating priors with the fact predator prey is not at current position

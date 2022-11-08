@@ -37,7 +37,9 @@ allowed_args = {
     "mode":int,
     "agent":int,
     "noisy":str2bool,
-    "quiet":str2bool
+    "quiet":str2bool,
+    "graphs":int,
+    "games":int
 }
 
 def processArgs():
@@ -161,7 +163,7 @@ def runGame(graph : Graph):
         else:
             if Environment.getInstance().ui:
                 renderer.__render__(running)
-                sleep(4)
+                sleep(2)
             break
         step_count+=1
     graph.reset_states()    
@@ -171,15 +173,14 @@ def runGame(graph : Graph):
     return [step_count, game_state]    
 
 def collectData() -> None:
-    
-    graph = Graph()
     stats_dict = dict()
     step_count_list = list()
     game_state_list = list()
     type_list = list()
-    for i in  tqdm(range(0,100)):
+    for i in  tqdm(range(0,Environment.getInstance().graphs)):
+        graph = Graph()
         type = i
-        for _ in tqdm(range(0,100),leave=False):
+        for _ in tqdm(range(0,Environment.getInstance().games),leave=False):
             [step_count, game_state] = runGame(graph) 
             step_count_list.append(step_count)
             game_state_list.append(game_state)
@@ -193,13 +194,14 @@ def collectData() -> None:
     timeout_count = game_state_list.count(-1)
     sys.stdout = sys.__stdout__
 
+    z = Environment.getInstance().games * Environment.getInstance().graphs
     print("========== GAME STATS ==========")
     print("Win Count: ",win_count)
-    print("Win %: ", (win_count/10000) * 100)
+    print("Win %: ", (win_count/z) * 100)
     print("Lose Count: ",lose_count)
-    print("Lose %: ", (lose_count/10000) * 100)
+    print("Lose %: ", (lose_count/z) * 100)
     print("Timeout Count: ",timeout_count)
-    print("Timeout %: ", (timeout_count/10000) * 100)
+    print("Timeout %: ", (timeout_count/z) * 100)
     print("================================")
     '''    
     stats_dict['graph_type'] = 1

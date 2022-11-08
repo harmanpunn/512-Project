@@ -24,6 +24,10 @@ class Environment:
 
             self.careful = False
             self.noisy = False
+
+            self.graphs = 30
+            self.games = 100
+
             Environment.instances.append(self)
         else:
             raise RuntimeError("Initialising Environment multiple times!")
