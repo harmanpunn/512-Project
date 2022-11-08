@@ -94,7 +94,12 @@ class Agent1(GraphEntity):
         
         if Environment.getInstance().careful:
             if agent_shortest_dist_predator <=5:
-                return random.choice(order_list[4])
+                if len(order_list[4]!=0):
+                    return random.choice(order_list[4])
+                elif len(order_list[5])!=0:
+                    return random.choice(order_list[5])
+                else:
+                    return curr_agent
             else:
                 return random.choice(close_to_prey)
 
