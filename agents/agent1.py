@@ -1,3 +1,5 @@
+import os
+import sys
 import random
 from graph import Graph
 from graphEntity import GraphEntity
@@ -31,6 +33,7 @@ class Agent1(GraphEntity):
 
     @staticmethod
     def get_next_position(prey, predator, graphInfo, curr_agent):
+    
         agent_shortest_dist_prey = get_shortest_path(graphInfo, curr_agent, prey)
         print('agent_shortest_dist_prey:', agent_shortest_dist_prey)
         agent_shortest_dist_predator = get_shortest_path(graphInfo, curr_agent, predator)

@@ -14,11 +14,16 @@ class Environment:
     def __init__(self, ui,nc) -> None:
         if len(Environment.instances)==0:
             self.ui = ui
+            
             self.node_count = nc
             self.agent = 1
+            self.quiet = True
+            
             self.expected_prey = -1
             self.expected_predator = -1
+
             self.careful = False
+            self.noisy = False
             Environment.instances.append(self)
         else:
             raise RuntimeError("Initialising Environment multiple times!")
