@@ -26,36 +26,15 @@ class Predator(GraphEntity):
         graphInfo = graph.info
         
         neighbor_list = graphInfo[self.position]
-        dsts = [get_shortest_path(graphInfo, el, agent_position) for el in neighbor_list]
-        min_len = min(dsts)
+        next_position = random.choice(neighbor_list)
+        if Environment.getInstance().agent>=5 and random.random()<=0.6:
+            print("Towards agent!")
+            dsts = [get_shortest_path(graphInfo, el, agent_position) for el in neighbor_list]
+            min_len = min(dsts)
 
-        equal_dsts = [neighbor_list[i] for i in range(0,len(neighbor_list)) if dsts[i]==min_len  ]
-        next_position = random.choice(equal_dsts)                
-
-        '''
-        src = self.position
-        dest = agent_position
-        distance = []
-        predecessor = list()
-
-        for i in range(len(graphInfo)):
-            distance.insert(i,9999)
-            predecessor.insert(i,-1)
-
-        if self.shortest_path(graphInfo, src, dest, distance, predecessor):
-            print('Short path is available')
-            path = []
-            j = dest
-            path.append(j)
-
-            while predecessor[j] != -1:
-                path.append(predecessor[j])
-                j = predecessor[j]
-
-
-            print("Shortest path : ", path)
-            print('New Position:', path[len(path) - 2])
-        '''
+            equal_dsts = [neighbor_list[i] for i in range(0,len(neighbor_list)) if dsts[i]==min_len  ]
+            next_position = random.choice(equal_dsts)                
+            
         # Update position of the predator
         self.nextPosition = next_position
 

@@ -17,7 +17,7 @@ class Environment:
             
             self.node_count = nc
             self.agent = 1
-            self.quiet = True
+            self.quiet = False
             
             self.expected_prey = -1
             self.expected_predator = -1

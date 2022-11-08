@@ -104,7 +104,7 @@ def runGame(graph : Graph):
 
     while True:
         if Environment.getInstance().ui:
-            sleep(1)
+            sleep(0.2)
             for event in pygame.event.get():
                 if event.type==pygame.QUIT:
                     running =False
@@ -177,9 +177,9 @@ def collectData() -> None:
     step_count_list = list()
     game_state_list = list()
     type_list = list()
-    for i in  tqdm(range(1,100)):
+    for i in  tqdm(range(0,100)):
         type = i
-        for _ in tqdm(range(0,30),leave=False):
+        for _ in tqdm(range(0,100),leave=False):
             [step_count, game_state] = runGame(graph) 
             step_count_list.append(step_count)
             game_state_list.append(game_state)
@@ -191,7 +191,7 @@ def collectData() -> None:
     win_count = game_state_list.count(1)
     lose_count = game_state_list.count(0)
     timeout_count = game_state_list.count(-1)
-
+    sys.stdout = sys.__stdout__
 
     print("========== GAME STATS ==========")
     print("Win Count: ",win_count)
