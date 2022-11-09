@@ -24,6 +24,7 @@ class Environment:
 
             self.careful = False
             self.noisy = False
+            self.noisy_agent = True
 
             self.graphs = 30
             self.games = 100

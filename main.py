@@ -38,6 +38,7 @@ allowed_args = {
     "agent":int,
     "noisy":str2bool,
     "quiet":str2bool,
+    "noisy_agent":str2bool,
     "graphs":int,
     "games":int
 }
