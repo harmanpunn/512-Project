@@ -22,7 +22,8 @@ class Agent5(GraphEntity):
         self.belief = [1.0/self.node_count]*self.node_count
 
         self.first_step = True
-    
+        self.chunk_size = 5
+
     def plan(self, graph: Graph, info):
         # List to keep track of neighbor with closest path to agent from all possible prey position
         close_nodes = []
@@ -43,12 +44,26 @@ class Agent5(GraphEntity):
         else:
             self.survey_and_update_beliefs(graph,close_nodes)                   
             # Spreading prior probabilities
+        
+        if not Environment.getInstance().careful:
+            max_val = max(self.belief)
+            max_beliefs = [i for i, v in enumerate(self.belief) if v==max_val]
+            Environment.getInstance().expected_predator = max_beliefs
+            predator = random.choice(max_beliefs)
+        else:
+            t = self.get_max_chunk(graph, self.chunk_size)
+            dists = [get_shortest_path(graphInfo, self.position, x) for x in range(t,t+self.chunk_size)]
+            min_val = min(dists)
+            print("+++++++++++++  Min Dists: ",str(min_val)," +++++++++++++++++++++++++=")
             
-        max_val = max(self.belief)
-        max_beliefs = [i for i, v in enumerate(self.belief) if v==max_val]
-        Environment.getInstance().expected_predator = max_beliefs
-        predator = random.choice(max_beliefs)
-
+            Environment.getInstance().expected_predator = [i for i in range(t,t+self.chunk_size)]
+            if t<= self.position and self.position <t+self.chunk_size:
+                predator = t
+            elif dists[0]<dists[self.chunk_size-1]:
+                predator = t
+            else:
+                predator = t+self.chunk_size-1
+        
         # Transitioning priors
         for node in range(0, self.node_count):
             sum = 0.0
@@ -60,18 +75,39 @@ class Agent5(GraphEntity):
 
         prey = info['prey']
         # neighbor_list = graph[self.position]
-        print("New Beliefs : ", self.belief)
+        # print("New Beliefs : ", self.belief)
         print('Agent Pos Curr:', self.position)
         print('Prey Position:', prey)
         print('Expected Predator Position:', predator)
-        if Environment.getInstance().agent %2==0:
-            p = self.get_max_belief_in_neigh(graph,1)
-            print(p)
-            Environment.getInstance().careful = p > 0.1
-            if Environment.getInstance().careful:
-                print("Extra Careful !!!!!!   ",str(p),"   !!!!!!!! ")
         self.nextPosition = Agent1.get_next_position(prey,predator, graphInfo, self.position)
 
+    def get_node(self):
+        max_val = max(self.belief)
+        max_beliefs = [i for i, v in enumerate(self.belief) if v==max_val]
+        Environment.getInstance().expected_predator = max_beliefs
+        return  random.choice(max_beliefs)
+
+    def get_max_chunk(self,graph:Graph,chunk_size):
+        i = 0
+        mxProb = 0.0
+        mxChunks = []
+        while i<self.node_count:
+            tmp = self.belief[i:i+chunk_size-1]
+            chunkProb = sum(tmp)
+            if mxProb < chunkProb:
+                mxProb = chunkProb
+            i+=chunk_size
+        i=0
+        while i<self.node_count:
+            tmp = self.belief[i:i+chunk_size-1]
+            chunkProb = sum(tmp)
+            if mxProb == chunkProb:
+                mxChunks.append(i)
+            i+=chunk_size
+        return random.choice(mxChunks)            
+                
+            
+    
     def get_max_belief_in_neigh(self, graph:Graph, range:int):
         fringe = deque()
 
@@ -108,11 +144,16 @@ class Agent5(GraphEntity):
             sum+= self.belief[node]
         self.belief = [x/sum for x in self.belief]
         
-        max_val = max(self.belief)
-        max_beliefs = [i for i, v in enumerate(self.belief) if v==max_val]
-
+        if not Environment.getInstance().careful:        
+            max_val = max(self.belief)
+            max_beliefs = [i for i, v in enumerate(self.belief) if v==max_val]
+        else:
+            t = self.get_max_chunk(graph,self.chunk_size)
+            max_val = max(self.belief[t:t+self.chunk_size-1])
+            max_beliefs = [i for i, v in enumerate(self.belief[t:t+self.chunk_size-1]) if v==max_val]
+        
         survey_node = random.choice(max_beliefs)
-        survey_res = graph.survey(survey_node)[0]
+        survey_res = graph.survey(survey_node)[0]    
         print("Surveying : ",survey_node)
 
         # Updating Priors with fact that predator not at survey location
