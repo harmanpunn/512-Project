@@ -87,12 +87,9 @@ class Graph:
                 return self._node_states[x]
             else:
                 t = deepcopy(self._node_states[x])
-                for i in range(0,len(t)):
-                    if t[i]:
-                        p = random.random()
-                        print(i," : ",p)
-                        if p>0.9:
-                            t[i] = False
+                p = random.random()
+                if p>0.9:
+                    t = [False for _ in t]
                 return t
             # if Environment.getInstance().agent<5:
             #     return self._node_states[x][2]

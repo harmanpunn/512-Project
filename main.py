@@ -44,8 +44,6 @@ allowed_args = {
 }
 
 def processArgs():
-    print("Number of args: ",str(len(sys.argv)))
-    print("Args: ",str(sys.argv))
     if len(sys.argv)>1:
         
         argv = sys.argv[1:]
