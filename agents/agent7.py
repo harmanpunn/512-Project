@@ -57,7 +57,7 @@ class Agent7(GraphEntity):
         self.prey_belief = [x/sums for x in self.prey_belief]
 
         survey_node = -1
-        if False or not 1.0 in self.predator_belief:
+        if (Environment.getInstance().agent==9 and max(self.predator_belief)<0.7) or (Environment.getInstance().agent!=9 and not 1.0 in self.predator_belief):
             # Use predator beliefs when not certain about predator
             print("Using predator beliefs")
             max_val = max(self.predator_belief)
@@ -75,7 +75,7 @@ class Agent7(GraphEntity):
         survey_res = survey_node_state[2]
         # Updating Priors with fact about prey at survey location
         if not survey_res:
-            eprint("No prey ;_;")
+            print("No prey ;_;")
             sums = 0.0
             for node in range(0,self.node_count):
                 if node != survey_node:
@@ -84,7 +84,7 @@ class Agent7(GraphEntity):
                     self.prey_belief[node]=0
             self.prey_belief = [x/sums for x in self.prey_belief]
         else:
-            eprint("Found ya prey!")
+            print("Found ya prey!")
             if not (Environment.getInstance().noisy_agent and Environment.getInstance().noisy):
                 for node in range(0,self.node_count):
                     self.prey_belief[node] = 0.0 if node!=survey_node else 1.0
@@ -102,16 +102,22 @@ class Agent7(GraphEntity):
         survey_res = survey_node_state[0]
         # Updating Priors with fact that predator not at survey location
         if not survey_res:
-            eprint("No predator XO")
+            print("No predator XO")
             sums = 0.0
+            prev = deepcopy(self.predator_belief)
+            # eprint(prev," : ",survey_node)
             for node in range(0,self.node_count):
                 if node != survey_node:
                     sums += self.predator_belief[node]
                 else:
                     self.predator_belief[node]=0
-            self.predator_belief = [x/sums for x in self.predator_belief]
+            try:
+                self.predator_belief = [x/sums for x in self.predator_belief]
+            except ZeroDivisionError:
+                eprint(prev," : ",survey_node)
+                raise ZeroDivisionError()
         else:
-            eprint("Found predator! RUNN!")
+            print("Found predator! RUNN!")
             if not (Environment.getInstance().noisy_agent and Environment.getInstance().noisy):
                 for node in range(0,self.node_count):
                     self.predator_belief[node] = 0.0 if node!=survey_node else 1.0

@@ -88,11 +88,16 @@ def runGame(graph : Graph):
         agent : GraphEntity = Agent3(graph) 
     elif Environment.getInstance().agent < 7:
         agent : GraphEntity = Agent5(graph) 
-    elif Environment.getInstance().agent < 9:
-        agent : GraphEntity = Agent7(graph)         
+        agent.belief = [1.0 if i==predator.getPosition() else 0.0 for i in range(0,Environment.getInstance().node_count)]
+    else:
+        agent : GraphEntity = Agent7(graph) 
+        agent.predator_belief = [1.0 if i==predator.getPosition() else 0.0 for i in range(0,Environment.getInstance().node_count)]        
 
         # agent : GraphEntity = get_class("Agent"+str(Environment.getInstance().agent))(graph)
 
+    if Environment.getInstance().agent==9:
+        Environment.getInstance().noisy_agent = True
+        Environment.getInstance().noisy = True
     running = 1
     print(graph.info)
     first_step = True
@@ -126,10 +131,7 @@ def runGame(graph : Graph):
                 info = {
                     'prey' : prey.getPosition()
                 }
-                agent.belief = [1.0 if i==predator.getPosition() else 0.0 for i in range(0,Environment.getInstance().node_count)]
-            elif Environment.getInstance().agent<9:
-                agent.predator_belief = [1.0 if i==predator.getPosition() else 0.0 for i in range(0,Environment.getInstance().node_count)]
-
+                
             graph.node_states_blocked= True
             agent.__update__(graph, info)
             graph.node_states_blocked = False

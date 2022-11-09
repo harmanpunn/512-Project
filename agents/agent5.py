@@ -87,7 +87,6 @@ class Agent5(GraphEntity):
             sums = 0.0
             print("No predator XO")
             for node in range(0,self.node_count):
-                eprint(node," : ",survey_node)
                 if node != survey_node:
                     sums += self.belief[node]
                 else:
