@@ -93,7 +93,7 @@ class Agent1(GraphEntity):
                 close_to_prey.append(key)
         
         if Environment.getInstance().careful:
-            if agent_shortest_dist_predator <=10:
+            if agent_shortest_dist_predator <=5:
                 print("RUNN BROOO!")
                 if len(order_list[4])!=0:
                     return random.choice(order_list[4])

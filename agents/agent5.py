@@ -3,7 +3,7 @@ from environment import Environment
 import random
 from graph import Graph
 from graphEntity import GraphEntity
-from util import get_shortest_path
+from util import get_shortest_path , eprint
 from collections import deque
 
 class Agent5(GraphEntity):
@@ -26,6 +26,7 @@ class Agent5(GraphEntity):
 
     def plan(self, graph: Graph, info):
         # List to keep track of neighbor with closest path to agent from all possible prey position
+        eprint("============= Sum of Probs : "+str(sum(self.belief))+" ===============")
         close_nodes = []
         graphInfo = graph.info
 
@@ -36,16 +37,34 @@ class Agent5(GraphEntity):
             min_len = min(dsts)
             equal_dsts = [neighbor_list[i] for i in range(0,len(neighbor_list)) if dsts[i]==min_len  ]
             close_nodes.append(equal_dsts)
-
-        if self.first_step:
-            for node in range(0, self.node_count):
-                self.belief[node] = 0.0 if node!=info["predator"] else 1.0
-            self.first_step= False
-        else:
-            self.survey_and_update_beliefs(graph,close_nodes)                   
-            # Spreading prior probabilities
+        # for n in range(0,self.node_count):
+        #     eprint(graphInfo[n]+[n]," > ",close_nodes[n])        
+        self.survey_and_update_beliefs(graph,close_nodes)                   
         
-        if not Environment.getInstance().careful:
+        # Spreading prior probabilities
+        # Predator moves
+        # for node in range(0, self.node_count):
+        #     sums = 0.0
+        #     for pr in range(0, self.node_count):
+        #         x = 0.0
+        #         if node in (graph.info[pr] + [pr]):
+        #             x += 0.4/(len(graph.info[pr])+1)
+        #         x +=  0.6*(1.0/len(close_nodes[pr]) if node in close_nodes[pr] else 0.0)
+        #         x *= self.belief[pr]
+        #         sums +=x 
+        #     self.belief[node] = sums
+
+        new_belief = [0.0 for _ in range(0, self.node_count)]
+        for pr in range(0,self.node_count):
+            for x in graphInfo[pr]:
+                new_belief[x] += self.belief[pr]*(0.6*(1/len(close_nodes[pr]) if x in close_nodes[pr] else 0.0) + 0.4/(len(graphInfo[pr])))
+        self.belief = new_belief
+        # eprint("Beliefs:  ",self.belief)
+
+
+        # eprint("=============4 Sum of Probs : "+str(sum(self.belief))+" ===============")
+        
+        if True or not Environment.getInstance().careful:
             max_val = max(self.belief)
             max_beliefs = [i for i, v in enumerate(self.belief) if v==max_val]
             Environment.getInstance().expected_predator = max_beliefs
@@ -64,15 +83,6 @@ class Agent5(GraphEntity):
             else:
                 predator = t+self.chunk_size-1
         
-        # Transitioning priors
-        for node in range(0, self.node_count):
-            sum = 0.0
-            for pr in range(0, self.node_count):
-                if node in graph.info[pr] or node==pr:
-                    sum += self.belief[pr]*(0.4/(len(graph.info[pr])+1) + 0.6*(1.0/len(close_nodes[pr]) if node in close_nodes[pr] else 0.0))
-            
-            self.belief[node] = sum
-
         prey = info['prey']
         # neighbor_list = graph[self.position]
         # print("New Beliefs : ", self.belief)
@@ -132,19 +142,27 @@ class Agent5(GraphEntity):
 
     def survey_and_update_beliefs(self,graph:Graph, close_nodes): 
         # Updating priors with the fact predator prey is not at current position
-
         # On all possible previous positions
-        sum = 0.0
+
+        sums = 0.0
         for node in range(0,self.node_count):
-            c = self.position in graph.info[node] or self.position==node
+            if node != self.position:
+                sums += self.belief[node]
+            else:
+                self.belief[node]=0
             # if current position is a possible move
-            if c:
-                self.belief[node] *= 0.4*((len(graph.info[node]))/(len(graph.info[node])+1)) + 0.6*(1.0/len(close_nodes[node]) if self.position in close_nodes[node] else 0.0)
-            # else it is possible always
-            sum+= self.belief[node]
-        self.belief = [x/sum for x in self.belief]
+            # c = self.position in graph.info[node] or self.position==node
+            # x = 0.0
+            # # random move
+            # x += 0.4*((len(graph.info[node]))/(len(graph.info[node])+1) if c else 1.0)
+            # # towards the agent
+            # x+= 0.6*(1.0 if not self.position in close_nodes[node] else 1 - (1.0/len(close_nodes[node])))
+
+            # self.belief[node] *=x
+            # sums+= self.belief[node]
+        self.belief = [x/sums for x in self.belief]
         
-        if not Environment.getInstance().careful:        
+        if True or not Environment.getInstance().careful:        
             max_val = max(self.belief)
             max_beliefs = [i for i, v in enumerate(self.belief) if v==max_val]
         else:
@@ -158,21 +176,29 @@ class Agent5(GraphEntity):
 
         # Updating Priors with fact that predator not at survey location
         if not survey_res:
-            sum = 0.0
+            sums = 0.0
             print("No predator XO")
             for node in range(0,self.node_count):
-                s = survey_node in graph.info[node] or survey_node==node
-                
-                # if survey position is a possible move
-                if s:
-                    self.belief[node] *= 0.4*((len(graph.info[node]))/(len(graph.info[node])+1)) + 0.6*(1.0/len(close_nodes[node]) if survey_node in close_nodes[node] else 0.0)
-                # else it is possible always
-                sum+= self.belief[node]
-            self.belief = [x/sum for x in self.belief]
+                eprint(node," : ",survey_node)
+                if node != survey_node:
+                    sums += self.belief[node]
+                else:
+                    self.belief[node]=0
+                # s = survey_node in graph.info[node] or survey_node==node
+                # x = 0.0
+                # # random move
+                # x += 0.4*((len(graph.info[node]))/(len(graph.info[node])+1) if s else 1.0)
+                # # towards the agent
+                # x+= 0.6*(1.0 if not survey_node in close_nodes[node] else 1 - (1.0/len(close_nodes[node])))
+                # self.belief[node] *=x
+                # sums+= self.belief[node]
+            self.belief = [x/sums for x in self.belief]
         else:
             print("Found predator! RUNN!")
             for node in range(0,self.node_count):
                 self.belief[node] = 0.0 if node!=survey_node else 1.0
+
+        # eprint("=============3 Sum of Probs : "+str(sum(self.belief))+" ===============")
 
                     
                 

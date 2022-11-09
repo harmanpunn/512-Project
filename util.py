@@ -1,3 +1,5 @@
+import sys
+
 def get_shortest_path(graph, src, dest):
     # print('src:',src)
     # print('dest:',dest)
@@ -51,3 +53,7 @@ def shortest_path(graph, src, dest, distance, predecessor):
                 if graph[curr][i] == dest:
                     return True
     return False
+
+def eprint(*args, **kwargs):
+    return
+    print(*args, file=sys.stderr, **kwargs)
