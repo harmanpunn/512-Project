@@ -150,7 +150,7 @@ def runGame(graph : Graph):
                 # Agent caught by predator
                 game_state = 0
 
-            if step_count > 200:
+            if step_count > 10000:
                 running = 0
                 # Timeout
                 game_state = -1 
