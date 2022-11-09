@@ -3,7 +3,7 @@ from environment import Environment
 import random
 from graph import Graph
 from graphEntity import GraphEntity
-from util import get_shortest_path
+from util import get_shortest_path, eprint
 from copy import deepcopy
 
 class Agent7(GraphEntity):
@@ -22,12 +22,11 @@ class Agent7(GraphEntity):
         self.prey_belief = [1.0/self.node_count]*self.node_count
         self.predator_belief = [1.0/self.node_count]*self.node_count
 
-        self.alpha = 0.9
-        self.theta = 2
-
         self.first_step = True
     
     def plan(self, graph: Graph, info):
+        eprint("Predator prob sums: ",str(sum(self.predator_belief)))
+        eprint("Prey     prob sums: ",str(sum(self.prey_belief)))
         close_nodes = []
         graphInfo = graph.info
 
@@ -38,33 +37,24 @@ class Agent7(GraphEntity):
             min_len = min(dsts)
             equal_dsts = [neighbor_list[i] for i in range(0,len(neighbor_list)) if dsts[i]==min_len  ]
             close_nodes.append(equal_dsts)
-        if self.first_step:
-            for node in range(0, self.node_count):
-                self.predator_belief[node] = 0.0 if node!=info["predator"] else 1.0
 
-        # Updating priors with the fact predator prey is not at current position
-
+        # Updating priors with the fact predator / prey is not at current position
         # Predator
-        # On all possible previous positions
-        sum = 0.0
+        sums = 0.0
         for node in range(0,self.node_count):
-            c = self.position in graph.info[node] or self.position==node
-            # if current position is a possible move
-            if c:
-                self.predator_belief[node] *= 0.4*((len(graph.info[node]))/(len(graph.info[node])+1)) + 0.6*(1.0/len(close_nodes[node]) if self.position in close_nodes[node] else 0.0)
-            # else it is possible always
-            sum+= self.predator_belief[node]
-        self.predator_belief = [x/sum for x in self.predator_belief]        
-        
-        # Pre
-        # On all possible previous positions
-        sum = 0.0
+            if node != self.position:
+                sums += self.predator_belief[node]
+            else:
+                self.predator_belief[node]=0
+        self.predator_belief = [x/sums for x in self.predator_belief]
+        # Prey
+        sums = 0.0
         for node in range(0,self.node_count):
-            c = self.position in graph.info[node] or self.position==node
-            if c:
-                self.prey_belief[node] *= (len(graph.info[node]))/(len(graph.info[node])+1)
-            sum+= self.prey_belief[node]
-        self.prey_belief = [x/sum for x in self.prey_belief]
+            if node != self.position:
+                sums += self.prey_belief[node]
+            else:
+                self.prey_belief[node]=0
+        self.prey_belief = [x/sums for x in self.prey_belief]
 
         survey_node = -1
         if not 1.0 in self.predator_belief:
@@ -72,14 +62,12 @@ class Agent7(GraphEntity):
             print("Using predator beliefs")
             max_val = max(self.predator_belief)
             max_beliefs = [i for i, v in enumerate(self.predator_belief) if v==max_val]
-
             survey_node = random.choice(max_beliefs)
         else:
             # Use predator beliefs when certain about predator
             print("Using prey beliefs")
             max_val = max(self.prey_belief)
             max_beliefs = [i for i, v in enumerate(self.prey_belief) if v==max_val]
-
             survey_node = random.choice(max_beliefs)
         
         survey_node_state = graph.survey(survey_node)
@@ -87,55 +75,47 @@ class Agent7(GraphEntity):
         survey_res = survey_node_state[2]
         # Updating Priors with fact about prey at survey location
         if not survey_res:
-            sum = 0.0
-            print("No prey ;_;")
+            sums = 0.0
             for node in range(0,self.node_count):
-                s = survey_node in graph.info[node] or survey_node==node
-                if s:
-                    self.prey_belief[node] *= (len(graph.info[node]))/(len(graph.info[node])+1)
-                sum+= self.prey_belief[node]
-            
-            self.prey_belief = [x/sum for x in self.prey_belief]
+                if node != survey_node:
+                    sums += self.prey_belief[node]
+                else:
+                    self.prey_belief[node]=0
+            self.prey_belief = [x/sums for x in self.prey_belief]
         else:
             print("Found ya prey!")
             if not Environment.getInstance().noisy:
                 for node in range(0,self.node_count):
                     self.prey_belief[node] = 0.0 if node!=survey_node else 1.0
             else:
-                sum = 0.0
+                sums = 0.0
                 print("No prey ;_;")
+                sums = 0.0
                 for node in range(0,self.node_count):
-                    s = survey_node in graph.info[node] or survey_node==node
-                    if s:
-                        self.prey_belief[node] *= (len(graph.info[node]))/(len(graph.info[node])+1)
-                    sum+= self.prey_belief[node]
-                
-                self.prey_belief = [0.1*x/sum for x in self.prey_belief]
-                for node in range(0,self.node_count):
-                    self.prey_belief[node] += 0.9*(0.0 if node!=survey_node else 1.0)
+                    if node != self.position:
+                        sums += self.prey_belief[node]
+                    else:
+                        self.prey_belief[node]=0
+                self.prey_belief = [x/sums for x in self.prey_belief]
 
             
         survey_res = survey_node_state[0]
         # Updating Priors with fact that predator not at survey location
         if not survey_res:
-            sum = 0.0
-            print("No predator XO")
+            sums = 0.0
             for node in range(0,self.node_count):
-                s = survey_node in graph.info[node] or survey_node==node
-                
-                # if survey position is a possible move
-                if s:
-                    self.predator_belief[node] *= 0.4*((len(graph.info[node]))/(len(graph.info[node])+1)) + 0.6*(1.0/len(close_nodes[node]) if survey_node in close_nodes[node] else 0.0)
-                # else it is possible always
-                sum+= self.predator_belief[node]
-            self.predator_belief = [x/sum for x in self.predator_belief]
+                if node != survey_node:
+                    sums += self.predator_belief[node]
+                else:
+                    self.predator_belief[node]=0
+            self.predator_belief = [x/sums for x in self.predator_belief]
         else:
             print("Found predator! RUNN!")
             if not Environment.getInstance().noisy:
                 for node in range(0,self.node_count):
                     self.predator_belief[node] = 0.0 if node!=survey_node else 1.0
             else:
-                sum = 0.0
+                sums = 0.0
                 print("No predator XO")
                 for node in range(0,self.node_count):
                     s = survey_node in graph.info[node] or survey_node==node
@@ -144,11 +124,27 @@ class Agent7(GraphEntity):
                     if s:
                         self.predator_belief[node] *= 0.4*((len(graph.info[node]))/(len(graph.info[node])+1)) + 0.6*(1.0/len(close_nodes[node]) if survey_node in close_nodes[node] else 0.0)
                     # else it is possible always
-                    sum+= self.predator_belief[node]
-                self.predator_belief = [0.1*x/sum for x in self.predator_belief]
+                    sums+= self.predator_belief[node]
+                self.predator_belief = [0.1*x/sums for x in self.predator_belief]
                 for node in range(0,self.node_count):
                     self.predator_belief[node] += 0.9*(0.0 if node!=survey_node else 1.0)
 
+        # Transitioning priors 
+        # Predator
+        new_belief = [0.0 for _ in range(0, self.node_count)]
+        for pr in range(0,self.node_count):
+            for x in graphInfo[pr]:
+                new_belief[x] += self.predator_belief[pr]*(0.6*(1/len(close_nodes[pr]) if x in close_nodes[pr] else 0.0) + 0.4/(len(graphInfo[pr])))
+        self.predator_belief = new_belief
+        # Prey
+        # Transitioning prior probabilities
+        temp_beliefs = [0.0 for _ in range(0,self.node_count)]
+        for parent in range(0,self.node_count):
+            for neigh in (graph.info[parent]+[parent]):
+                temp_beliefs[neigh] += self.prey_belief[parent]/(len(graph.info[parent])+1)        
+        self.prey_belief  = temp_beliefs
+
+        
         # Picking predator & prey positions        
         max_val = max(self.predator_belief)
         max_beliefs = [i for i, v in enumerate(self.predator_belief) if v==max_val]
@@ -161,24 +157,6 @@ class Agent7(GraphEntity):
         prey = random.choice(max_beliefs)
 
 
-        # Transitioning priors 
-        for node in range(0, self.node_count):
-            sum = 0.0
-            for pr in range(0, self.node_count):
-                if node in graph.info[pr] or node==pr:
-                    sum += self.predator_belief[pr]*(0.4/(len(graph.info[pr])+1) + 0.6*(1.0/len(close_nodes[pr]) if node in close_nodes[pr] else 0.0))
-            
-            self.predator_belief[node] = sum
-
-        for node in range(0, self.node_count):
-            sum = 0.0
-            for pr in range(0, self.node_count):
-                if node in graph.info[pr] or node==pr:
-                    sum += self.prey_belief[pr]/(len(graph.info[pr])+1)
-            
-            self .prey_belief[node] = sum
-        
-        
         print('Agent Pos Curr:', self.position)
         print('Expected Prey Position:', prey)
         print('Expected Predator Position:', predator)

@@ -55,5 +55,5 @@ def shortest_path(graph, src, dest, distance, predecessor):
     return False
 
 def eprint(*args, **kwargs):
-    return
+    # return
     print(*args, file=sys.stderr, **kwargs)
