@@ -27,6 +27,7 @@ class Agent7(GraphEntity):
     def plan(self, graph: Graph, info):
         eprint("Predator prob sums: ",str(sum(self.predator_belief)))
         eprint("Prey     prob sums: ",str(sum(self.prey_belief)))
+        eprint("Pred: ",self.predator_belief)
         close_nodes = []
         graphInfo = graph.info
 
@@ -98,43 +99,43 @@ class Agent7(GraphEntity):
                 self.prey_belief = [0.9*(0.0 if i!=survey_node else 1.0) + 0.1*self.prey_belief[i]/sums for i in range(0,self.node_count)]
                 
 
-            
-        survey_res = survey_node_state[0]
-        # Updating Priors with fact that predator not at survey location
-        if not survey_res:
-            print("No predator XO")
-            sums = 0.0
-            prev = deepcopy(self.predator_belief)
-            # eprint(prev," : ",survey_node)
-            for node in range(0,self.node_count):
-                if node != survey_node:
-                    sums += self.predator_belief[node]
-                else:
-                    self.predator_belief[node]=0
-            try:
-                self.predator_belief = [x/sums for x in self.predator_belief]
-            except ZeroDivisionError:
-                eprint(prev," : ",survey_node)
-                raise ZeroDivisionError()
-        else:
-            print("Found predator! RUNN!")
-            if not (Environment.getInstance().noisy_agent and Environment.getInstance().noisy):
-                for node in range(0,self.node_count):
-                    self.predator_belief[node] = 0.0 if node!=survey_node else 1.0
-            else:
-                temp_beliefs = [0.0 for _ in range(0,self.node_count)]
-                for node in range(0,self.node_count):
-                    temp_beliefs[node] = 0.9*(0.0 if node!=survey_node else 1.0)
-                
-                temp_beliefs1 = [0.0 for _ in range(0,self.node_count)]
+        if not 1.0 in self.predator_belief:
+            survey_res = survey_node_state[0]
+            # Updating Priors with fact that predator not at survey location
+            if not survey_res:
+                print("No predator XO")
+                sums = 0.0
+                prev = deepcopy(self.predator_belief)
+                # eprint(prev," : ",survey_node)
                 for node in range(0,self.node_count):
                     if node != survey_node:
                         sums += self.predator_belief[node]
                     else:
-                        temp_beliefs1[node]=0.0
-                temp_beliefs1 = [0.1*x/sums for x in self.prey_belief]
+                        self.predator_belief[node]=0
+                try:
+                    self.predator_belief = [x/sums for x in self.predator_belief]
+                except ZeroDivisionError:
+                    eprint(prev," : ",survey_node)
+                    raise ZeroDivisionError()
+            else:
+                print("Found predator! RUNN!")
+                if not (Environment.getInstance().noisy_agent and Environment.getInstance().noisy):
+                    for node in range(0,self.node_count):
+                        self.predator_belief[node] = 0.0 if node!=survey_node else 1.0
+                else:
+                    temp_beliefs = [0.0 for _ in range(0,self.node_count)]
+                    for node in range(0,self.node_count):
+                        temp_beliefs[node] = 0.9*(0.0 if node!=survey_node else 1.0)
+                    
+                    temp_beliefs1 = [0.0 for _ in range(0,self.node_count)]
+                    for node in range(0,self.node_count):
+                        if node != survey_node:
+                            sums += self.predator_belief[node]
+                        else:
+                            temp_beliefs1[node]=0.0
+                    temp_beliefs1 = [0.1*x/sums for x in self.prey_belief]
 
-                self.predator_belief = [temp_beliefs[node] + temp_beliefs1[node] for node in range(0, self.node_count)]
+                    self.predator_belief = [temp_beliefs[node] + temp_beliefs1[node] for node in range(0, self.node_count)]
         # Transitioning priors 
         # Predator
         new_belief = [0.0 for _ in range(0, self.node_count)]
