@@ -58,7 +58,7 @@ class Agent7(GraphEntity):
         self.prey_belief = [x/sums for x in self.prey_belief]
 
         survey_node = -1
-        if (Environment.getInstance().agent==9 and max(self.predator_belief)<0.7) or (Environment.getInstance().agent!=9 and not 1.0 in self.predator_belief):
+        if (Environment.getInstance().agent==9 and max(self.predator_belief)<0.5) or (Environment.getInstance().agent!=9 and not 1.0 in self.predator_belief):
             # Use predator beliefs when not certain about predator
             print("Using predator beliefs")
             max_val = max(self.predator_belief)
@@ -172,7 +172,7 @@ class Agent7(GraphEntity):
         if not Environment.getInstance().careful:
             self.nextPosition = Agent1.get_next_position(prey,predator, graphInfo, self.position)
         else:
-            self.nextPosition = Agent1.get_next_position(deepcopy(self.prey_belief),deepcopy(self.predator_belief), graphInfo, self.position)
+            self.nextPosition = Agent1.get_next_position(prey,deepcopy(self.predator_belief), graphInfo, self.position)
 
 
         

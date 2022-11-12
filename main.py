@@ -98,6 +98,7 @@ def runGame(graph : Graph):
     if Environment.getInstance().agent==9:
         Environment.getInstance().noisy_agent = True
         Environment.getInstance().noisy = True
+        Environment.getInstance().careful = True
 
     running = 1
     print(graph.info)
