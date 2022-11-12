@@ -169,7 +169,11 @@ class Agent7(GraphEntity):
         print('Expected Predator Position:', predator)
         if self.first_step:
             self.first_step = False
-        self.nextPosition = Agent1.get_next_position(prey,predator, graphInfo, self.position)
+        if not Environment.getInstance().careful:
+            self.nextPosition = Agent1.get_next_position(prey,predator, graphInfo, self.position)
+        else:
+            self.nextPosition = Agent1.get_next_position(deepcopy(self.prey_belief),deepcopy(self.predator_belief), graphInfo, self.position)
+
 
         
 
