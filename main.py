@@ -31,11 +31,21 @@ def str2bool(v):
     else:
         raise RuntimeError("Invalid value")
 
+def strToAgent(x):
+    if x=="x":
+        return 10
+    else:
+        p = int(x)
+        if p>=1 and p<=9:
+            return p
+        else:
+            raise ValueError()
+
 allowed_args = {
     "ui":str2bool,
     "node_count":int,
     "mode":int,
-    "agent":int,
+    "agent":strToAgent,
     "noisy":str2bool,
     "quiet":str2bool,
     "noisy_agent":str2bool,
@@ -99,6 +109,13 @@ def runGame(graph : Graph):
         Environment.getInstance().noisy_agent = True
         Environment.getInstance().noisy = True
         Environment.getInstance().careful = True
+
+    if Environment.getInstance().agent==10:
+        Environment.getInstance().noisy = False
+        Environment.getInstance().noisy_agent = False
+        Environment.getInstance().careful = True
+        Environment.getInstance().agentX = True
+    
 
     running = 1
     print(graph.info)

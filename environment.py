@@ -22,6 +22,7 @@ class Environment:
             self.expected_prey = -1
             self.expected_predator = -1
 
+            self.agentX = False
             self.careful = False
             self.noisy = False
             self.noisy_agent = False
