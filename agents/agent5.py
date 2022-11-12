@@ -5,6 +5,7 @@ from graph import Graph
 from graphEntity import GraphEntity
 from util import get_shortest_path , eprint
 from collections import deque
+from copy import deepcopy
 
 class Agent5(GraphEntity):
     def __init__(self, graph : Graph) -> None:
@@ -52,7 +53,10 @@ class Agent5(GraphEntity):
         print('Agent Pos Curr:', self.position)
         print('Prey Position:', prey)
         print('Expected Predator Position:', predator)
-        self.nextPosition = Agent1.get_next_position(prey,predator, graphInfo, self.position)
+        if not Environment.getInstance().careful:
+            self.nextPosition = Agent1.get_next_position(prey,predator, graphInfo, self.position)
+        else:
+            self.nextPosition = Agent1.get_next_position(prey,deepcopy(self.belief), graphInfo, self.position)
 
     def get_node(self):
         max_val = max(self.belief)

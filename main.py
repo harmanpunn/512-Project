@@ -98,6 +98,7 @@ def runGame(graph : Graph):
     if Environment.getInstance().agent==9:
         Environment.getInstance().noisy_agent = True
         Environment.getInstance().noisy = True
+
     running = 1
     print(graph.info)
     first_step = True
@@ -220,7 +221,7 @@ if __name__ == "__main__":
     for x in args.keys():
         setattr(env,x,args[x]) 
     
-    if Environment.getInstance().quiet==True or 'mode' in args.keys() and args['mode']==1:
+    if Environment.getInstance().quiet==True:
         sys.stdout = open(os.devnull, 'w')
     if 'mode' in args.keys() and args['mode']==1:
         print("Mode different")
