@@ -27,11 +27,11 @@ class GraphEntity:
     # DO NOT OVERRIDE
     def __update__(self, graph : Graph, info = None):
         self.plan(graph, info)
-        self.move(graph)
+        self.update_move(graph)
     
     # Generic move logic
     # DO NOT OVERRIDE
-    def move(self, graph : Graph):
+    def update_move(self, graph : Graph):
         if self.nextPosition!=None:
             graph.deallocate_pos(self.position,self.type)
             graph.allocate_pos(self.nextPosition,self.type)

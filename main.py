@@ -31,18 +31,29 @@ def str2bool(v):
     else:
         raise RuntimeError("Invalid value")
 
+def strToAgent(x):
+    if x=="x":
+        return 10
+    else:
+        p = int(x)
+        if p>=1 and p<=9:
+            return p
+        else:
+            raise ValueError()
+
 allowed_args = {
     "ui":str2bool,
     "node_count":int,
     "mode":int,
-    "agent":int,
+    "agent":strToAgent,
     "noisy":str2bool,
-    "quiet":str2bool
+    "quiet":str2bool,
+    "noisy_agent":str2bool,
+    "graphs":int,
+    "games":int
 }
 
 def processArgs():
-    print("Number of args: ",str(len(sys.argv)))
-    print("Args: ",str(sys.argv))
     if len(sys.argv)>1:
         
         argv = sys.argv[1:]
@@ -87,10 +98,24 @@ def runGame(graph : Graph):
         agent : GraphEntity = Agent3(graph) 
     elif Environment.getInstance().agent < 7:
         agent : GraphEntity = Agent5(graph) 
-    elif Environment.getInstance().agent < 9:
-        agent : GraphEntity = Agent7(graph)         
+        agent.belief = [1.0 if i==predator.getPosition() else 0.0 for i in range(0,Environment.getInstance().node_count)]
+    else:
+        agent : GraphEntity = Agent7(graph) 
+        agent.predator_belief = [1.0 if i==predator.getPosition() else 0.0 for i in range(0,Environment.getInstance().node_count)]        
 
         # agent : GraphEntity = get_class("Agent"+str(Environment.getInstance().agent))(graph)
+
+    if Environment.getInstance().agent==9:
+        Environment.getInstance().noisy_agent = True
+        Environment.getInstance().noisy = True
+        Environment.getInstance().careful = True
+
+    if Environment.getInstance().agent==10:
+        Environment.getInstance().noisy = False
+        Environment.getInstance().noisy_agent = False
+        Environment.getInstance().careful = True
+        Environment.getInstance().agentX = True
+    
 
     running = 1
     print(graph.info)
@@ -125,14 +150,7 @@ def runGame(graph : Graph):
                 info = {
                     'prey' : prey.getPosition()
                 }
-                if first_step:
-                    info["predator"] = predator.getPosition()
-                    first_step = False
-            else:
-                if first_step:
-                    info["predator"] = predator.getPosition()
-                    first_step = False
-
+                
             graph.node_states_blocked= True
             agent.__update__(graph, info)
             graph.node_states_blocked = False
@@ -153,7 +171,7 @@ def runGame(graph : Graph):
                 # Agent caught by predator
                 game_state = 0
 
-            if step_count > 200:
+            if step_count > 10000:
                 running = 0
                 # Timeout
                 game_state = -1 
@@ -161,7 +179,7 @@ def runGame(graph : Graph):
         else:
             if Environment.getInstance().ui:
                 renderer.__render__(running)
-                sleep(4)
+                sleep(2)
             break
         step_count+=1
     graph.reset_states()    
@@ -171,15 +189,14 @@ def runGame(graph : Graph):
     return [step_count, game_state]    
 
 def collectData() -> None:
-    
-    graph = Graph()
     stats_dict = dict()
     step_count_list = list()
     game_state_list = list()
     type_list = list()
-    for i in  tqdm(range(0,100)):
+    for i in  tqdm(range(0,Environment.getInstance().graphs)):
+        graph = Graph()
         type = i
-        for _ in tqdm(range(0,100),leave=False):
+        for _ in tqdm(range(0,Environment.getInstance().games),leave=False):
             [step_count, game_state] = runGame(graph) 
             step_count_list.append(step_count)
             game_state_list.append(game_state)
@@ -193,13 +210,14 @@ def collectData() -> None:
     timeout_count = game_state_list.count(-1)
     sys.stdout = sys.__stdout__
 
+    z = Environment.getInstance().games * Environment.getInstance().graphs
     print("========== GAME STATS ==========")
     print("Win Count: ",win_count)
-    print("Win %: ", (win_count/3000) * 100)
+    print("Win %: ", (win_count/z) * 100)
     print("Lose Count: ",lose_count)
-    print("Lose %: ", (lose_count/3000) * 100)
+    print("Lose %: ", (lose_count/z) * 100)
     print("Timeout Count: ",timeout_count)
-    print("Timeout %: ", (timeout_count/3000) * 100)
+    print("Timeout %: ", (timeout_count/z) * 100)
     print("================================")
     '''    
     stats_dict['graph_type'] = 1
@@ -221,7 +239,7 @@ if __name__ == "__main__":
     for x in args.keys():
         setattr(env,x,args[x]) 
     
-    if Environment.getInstance().quiet==True or 'mode' in args.keys() and args['mode']==1:
+    if Environment.getInstance().quiet==True:
         sys.stdout = open(os.devnull, 'w')
     if 'mode' in args.keys() and args['mode']==1:
         print("Mode different")

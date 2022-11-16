@@ -17,13 +17,19 @@ class Environment:
             
             self.node_count = nc
             self.agent = 1
-            self.quiet = False
+            self.quiet = True
             
             self.expected_prey = -1
             self.expected_predator = -1
 
+            self.agentX = False
             self.careful = False
             self.noisy = False
+            self.noisy_agent = False
+
+            self.graphs = 30
+            self.games = 100
+
             Environment.instances.append(self)
         else:
             raise RuntimeError("Initialising Environment multiple times!")

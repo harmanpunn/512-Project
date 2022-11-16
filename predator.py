@@ -27,8 +27,7 @@ class Predator(GraphEntity):
         
         neighbor_list = graphInfo[self.position]
         next_position = random.choice(neighbor_list)
-        if Environment.getInstance().agent>=5 and random.random()<=0.6:
-            print("Towards agent!")
+        if (Environment.getInstance().agent>=5 and random.random()<=0.6) or Environment.getInstance().agent<5:
             dsts = [get_shortest_path(graphInfo, el, agent_position) for el in neighbor_list]
             min_len = min(dsts)
 
