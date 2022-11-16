@@ -33,10 +33,7 @@ class Agent1(GraphEntity):
 
     @staticmethod
     def get_next_position(prey, predator, graphInfo, curr_agent):
-        if True or Environment.getInstance().agent<8:
-            agent_shortest_dist_prey = get_shortest_path(graphInfo, curr_agent, prey)
-        else:
-            agent_shortest_dist_prey = Agent1.getExpectedDist(graphInfo, prey, curr_agent)
+        agent_shortest_dist_prey = get_shortest_path(graphInfo, curr_agent, prey)
         print('agent_shortest_dist_prey:', agent_shortest_dist_prey)
         # Shortest Path to predator
         if Environment.getInstance().agent>5 and Environment.getInstance().careful :
@@ -51,13 +48,10 @@ class Agent1(GraphEntity):
         for el in neighbor_list:
             
             # Shortest Path to prey
-            if True or Environment.getInstance().agent<8:
-                path_len_to_prey = get_shortest_path(graphInfo, el, prey)
-            else:
-                path_len_to_prey = Agent1.getNewPreyDist(graphInfo, prey, el)
-
+            path_len_to_prey = get_shortest_path(graphInfo, el, prey)
+            
             # Shortest Path to predator
-            if Environment.getInstance().agent>5 and Environment.getInstance().careful:
+            if Environment.getInstance().careful:
                 path_len_to_predator = Agent1.getNewPredatorDist(graphInfo,predator,el)
             else:
                 path_len_to_predator = get_shortest_path(graphInfo, el, predator)

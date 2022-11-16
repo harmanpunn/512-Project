@@ -119,7 +119,7 @@ def runGame(graph : Graph):
 
     running = 1
     print(graph.info)
-    first_step = True
+    # print()
 
     if Environment.getInstance().noisy:
         print("So NOISY!")
