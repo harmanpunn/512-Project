@@ -17,6 +17,8 @@ from agents.agent3 import Agent3
 from agents.agent5 import Agent5
 from agents.agent7 import Agent7
 
+import numpy as np
+
 from predator import Predator
 from prey import Prey
 
@@ -127,6 +129,7 @@ def runGame(graph : Graph):
     if Environment.getInstance().careful:
         print("TipToe B)")
 
+    knownRounds = None
     while True:
         if Environment.getInstance().ui:
             sleep(0.2)
@@ -152,7 +155,13 @@ def runGame(graph : Graph):
                 }
                 
             graph.node_states_blocked= True
-            agent.__update__(graph, info)
+            knows = agent.__update__(graph, info)
+
+            if knownRounds!=None:
+                knownRounds = [knows[i]+knownRounds[i] for i in range(0,len(knownRounds))]
+            else:
+                knownRounds = knows
+                
             graph.node_states_blocked = False
             
             predator.__update__(graph, {'agent':agent.getPosition()})
@@ -175,35 +184,47 @@ def runGame(graph : Graph):
                 running = 0
                 # Timeout
                 game_state = -1 
-
+            step_count+=1
         else:
             if Environment.getInstance().ui:
                 renderer.__render__(running)
                 sleep(2)
             break
-        step_count+=1
     graph.reset_states()    
-    
+    knownRounds = [k/step_count for k in knownRounds]
     if Environment.getInstance().ui:
         pygame.quit()
-    return [step_count, game_state]    
+    return [step_count, game_state, knownRounds]  
 
 def collectData() -> None:
     stats_dict = dict()
-    step_count_list = list()
+    step_count_list = {0:0.0,1:0.0,-1:0.0}
     game_state_list = list()
     type_list = list()
+    totalConfidences = [[],[]]
     for i in  tqdm(range(0,Environment.getInstance().graphs)):
         graph = Graph()
         type = i
+        confidencePerGraph = [0.0,0.0] 
         for _ in tqdm(range(0,Environment.getInstance().games),leave=False):
-            [step_count, game_state] = runGame(graph) 
-            step_count_list.append(step_count)
+            [step_count, game_state, confidence] = runGame(graph) 
+            step_count_list[game_state]+=step_count
             game_state_list.append(game_state)
             type_list.append(type)
+            confidencePerGraph = [confidencePerGraph[i]+ confidence[i] for i in range(0, len(confidence))]
+            
+        confidencePerGraph = [x/Environment.getInstance().games for x in confidencePerGraph]
+        for i in range(0,len(confidencePerGraph)):
+            totalConfidences[i].append(confidencePerGraph[i])
         
-
-    stats_dict = {'graph_type': type_list, 'step_count': step_count_list, 'game_count' : game_state_list}
+    
+    for k in step_count_list:
+        step_count_list[k] /= Environment.getInstance().games * Environment.getInstance().graphs
+    
+    for t in totalConfidences:
+        t = np.array(t)
+        
+    
 
     win_count = game_state_list.count(1)
     lose_count = game_state_list.count(0)
@@ -212,11 +233,13 @@ def collectData() -> None:
 
     z = Environment.getInstance().games * Environment.getInstance().graphs
     print("========== GAME STATS ==========")
-    print("Win Count: ",win_count)
+    print("Predator confidence : Mean: ",np.mean(totalConfidences[0])," || Standard Deviation: ",np.std(totalConfidences[0]))
+    print("Prey confidence : Mean: ",np.mean(totalConfidences[1])," || Standard Deviation: ",np.std(totalConfidences[1]))
+    print("Win Step Counts: ", step_count_list[1])
     print("Win %: ", (win_count/z) * 100)
-    print("Lose Count: ",lose_count)
+    print("Lose Step Count: ",step_count_list[0])
     print("Lose %: ", (lose_count/z) * 100)
-    print("Timeout Count: ",timeout_count)
+    print("Timeout Step Count: ",step_count_list[-1])
     print("Timeout %: ", (timeout_count/z) * 100)
     print("================================")
     '''    

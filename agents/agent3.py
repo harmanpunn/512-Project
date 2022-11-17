@@ -56,7 +56,10 @@ class Agent3(GraphEntity):
             for node in range(0,self.node_count):
                 self.belief[node] = 0.0 if node!=survey_node else 1.0
         
-        eprint(" ==== Prob Sum 3 : ",str(sum(self.belief)))
+        knows = [1,0] 
+        if max(self.belief)==1.0:
+            knows = [1,1]          
+        
 
         # Transitioning prior probabilities
         temp_beliefs = [0.0 for x in range(0,self.node_count)]
@@ -79,6 +82,8 @@ class Agent3(GraphEntity):
         print('Predator Position:', predator)
 
         self.nextPosition = Agent1.get_next_position(prey,predator, graphInfo, self.position)
+
+        return knows
 
         
 

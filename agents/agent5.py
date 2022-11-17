@@ -35,7 +35,10 @@ class Agent5(GraphEntity):
             equal_dsts = [neighbor_list[i] for i in range(0,len(neighbor_list)) if dsts[i]==min_len  ]
             close_nodes.append(equal_dsts)
 
-        self.survey_and_update_beliefs(graph,close_nodes)                   
+        self.survey_and_update_beliefs(graph,close_nodes)
+        knows = [0,1] 
+        if max(self.belief)==1.0:
+            knows = [1,1]          
         
         # Spreading prior probabilities
         new_belief = [0.0 for _ in range(0, self.node_count)]
@@ -57,6 +60,7 @@ class Agent5(GraphEntity):
             self.nextPosition = Agent1.get_next_position(prey,predator, graphInfo, self.position)
         else:
             self.nextPosition = Agent1.get_next_position(prey,deepcopy(self.belief), graphInfo, self.position)
+        return knows
 
     def get_node(self):
         max_val = max(self.belief)

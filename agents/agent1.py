@@ -28,7 +28,7 @@ class Agent1(GraphEntity):
         print('Prey Position:', prey)
         print('Predator Position:', predator)
         self.nextPosition = Agent1.get_next_position(prey, predator, graphInfo, self.position)
-        
+        return [1,1]
         # self.move(graph)
 
     @staticmethod

@@ -26,8 +26,9 @@ class GraphEntity:
     """
     # DO NOT OVERRIDE
     def __update__(self, graph : Graph, info = None):
-        self.plan(graph, info)
+        knows = self.plan(graph, info)
         self.update_move(graph)
+        return knows
     
     # Generic move logic
     # DO NOT OVERRIDE

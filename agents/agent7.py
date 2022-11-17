@@ -138,6 +138,13 @@ class Agent7(GraphEntity):
                         temp_beliefs1 = [0.1*x/sums for x in self.prey_belief]
 
                         self.predator_belief = [temp_beliefs[node] + temp_beliefs1[node] for node in range(0, self.node_count)]
+
+        knows = [0,0] 
+        if max(self.predator_belief)==1.0:
+            knows[0] = 1
+        if max(self.prey_belief)==1.0:
+            knows[1] = 1          
+        
         # Transitioning priors 
         # Predator
         new_belief = [0.0 for _ in range(0, self.node_count)]
@@ -177,6 +184,8 @@ class Agent7(GraphEntity):
             self.nextPosition = Agent1.get_next_position(prey,predator, graphInfo, self.position)
         else:
             self.nextPosition = Agent1.get_next_position(prey,deepcopy(self.predator_belief), graphInfo, self.position)
+        
+        return knows
 
     def survey_or_move(self,graphInfo):
         eprint("Predator max: ",max(self.predator_belief))
