@@ -172,8 +172,8 @@ class Agent7(GraphEntity):
         Environment.getInstance().expected_prey =  deepcopy(max_beliefs)
         prey = random.choice(max_beliefs)
 
-        if survey_or_move:
-            return
+        if Environment.getInstance().agentX and survey_or_move:
+            return knows
 
         print('Agent Pos Curr:', self.position)
         print('Expected Prey Position:', prey)
