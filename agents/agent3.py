@@ -3,7 +3,7 @@ from environment import Environment
 import random
 from graph import Graph
 from graphEntity import GraphEntity
-from util import get_shortest_path, eprint
+from util import get_shortest_path, eprint, getNewBeliefs, transitionProbabilities
 
 class Agent3(GraphEntity):
     def __init__(self, graph : Graph) -> None:
@@ -26,13 +26,7 @@ class Agent3(GraphEntity):
         # Updating priors with the fact that prey is not at current position
         eprint(" ==== Prob Sum : ",str(sum(self.belief)))
 
-        sums = 0.0
-        for node in range(0,self.node_count):
-            if node != self.position:
-                sums += self.belief[node]
-            else:
-                self.belief[node]=0
-        self.belief = [x/sums for x in self.belief]
+        self.belief = getNewBeliefs(self.belief,self.position,False)
         
         # Pick max belief node to survey
         max_val = max(self.belief)
@@ -42,31 +36,14 @@ class Agent3(GraphEntity):
         print("Surveying : ",survey_node)
 
         # Updating Priors with fact that prey not at survey location
-        if not survey_res:
-            sums = 0.0
-            print("No prey ;_;")
-            for node in range(0,self.node_count):
-                if node!=survey_node:
-                    sums+= self.belief[node]
-                else:
-                    self.belief[node]=0
-            self.belief = [x/sums for x in self.belief]
-        else:
-            print("Found ya prey!")
-            for node in range(0,self.node_count):
-                self.belief[node] = 0.0 if node!=survey_node else 1.0
-        
+        self.belief = getNewBeliefs(self.belief,survey_node, survey_res)
+
         knows = [1,0] 
         if max(self.belief)==1.0:
             knows = [1,1]          
         
-
-        # Transitioning prior probabilities
-        temp_beliefs = [0.0 for x in range(0,self.node_count)]
-        for parent in range(0,self.node_count):
-            for neigh in (graph.info[parent]+[parent]):
-                temp_beliefs[neigh] += self.belief[parent]/(len(graph.info[parent])+1)        
-        self.belief  = temp_beliefs
+        # Transitioning prior probabilities        
+        self.belief  = transitionProbabilities(self.belief,graph.info)
 
         # Selecting next move
         max_val = max(self.belief)
@@ -84,16 +61,3 @@ class Agent3(GraphEntity):
         self.nextPosition = Agent1.get_next_position(prey,predator, graphInfo, self.position)
 
         return knows
-
-        
-
-                    
-                
-
-    
-
-        
-    
-    
-    
-        
