@@ -1,4 +1,5 @@
 import sys
+from environment import Environment
 
 def get_shortest_path(graph, src, dest):
     # print('src:',src)
@@ -57,3 +58,41 @@ def shortest_path(graph, src, dest, distance, predecessor):
 def eprint(*args, **kwargs):
     return
     print(*args, file=sys.stderr, **kwargs)
+
+
+def getNewBeliefs(belief,survey_node, survey_res):
+    if not survey_res:
+        sums = 0.0
+        for node in range(0,Environment.getInstance().node_count):
+            if node != survey_node:
+                sums += belief[node]
+            else:
+                belief[node]=0
+        belief =  [x/sums for x in belief]
+    else:
+        if not (Environment.getInstance().noisy_agent and Environment.getInstance().noisy):
+            for node in range(0,Environment.getInstance().node_count):
+                belief[node] = 0.0 if node!=survey_node else 1.0
+        else:
+            sums = 0.0
+            for node in range(0,Environment.getInstance().node_count):
+                if node != survey_node:
+                    sums += belief[node]
+                else:
+                    belief[node]=0
+            belief = [0.9*(0.0 if i!=survey_node else 1.0) + 0.1*belief[i]/sums for i in range(0,Environment.getInstance().node_count)]
+    return belief
+
+def transitionProbabilities(belief, graphInfo, closeNodes = None, pred=False):
+    temp_beliefs = [0.0 for x in range(0,Environment.getInstance().node_count)]
+    if not pred:
+        for parent in range(0,Environment.getInstance().node_count):
+            for neigh in (graphInfo[parent]+[parent]):
+                temp_beliefs[neigh] += belief[parent]/(len(graphInfo[parent])+1)  
+        return temp_beliefs
+    else:
+        new_belief = [0.0 for _ in range(0, Environment.getInstance().node_count)]
+        for pr in range(0,Environment.getInstance().node_count):
+            for x in graphInfo[pr]:
+                new_belief[x] += belief[pr]*(0.6*(1/len(closeNodes[pr]) if x in closeNodes[pr] else 0.0) + 0.4/(len(graphInfo[pr])))
+        return new_belief

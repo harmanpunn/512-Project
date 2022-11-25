@@ -3,7 +3,7 @@ from environment import Environment
 import random
 from graph import Graph
 from graphEntity import GraphEntity
-from util import get_shortest_path , eprint
+from util import get_shortest_path , eprint, getNewBeliefs, transitionProbabilities
 from collections import deque
 from copy import deepcopy
 
@@ -41,11 +41,7 @@ class Agent5(GraphEntity):
             knows = [1,1]          
         
         # Spreading prior probabilities
-        new_belief = [0.0 for _ in range(0, self.node_count)]
-        for pr in range(0,self.node_count):
-            for x in graphInfo[pr]:
-                new_belief[x] += self.belief[pr]*(0.6*(1/len(close_nodes[pr]) if x in close_nodes[pr] else 0.0) + 0.4/(len(graphInfo[pr])))
-        self.belief = new_belief
+        self.belief = transitionProbabilities(self.belief, graphInfo,close_nodes, True)
         
         max_val = max(self.belief)
         max_beliefs = [i for i, v in enumerate(self.belief) if v==max_val]
@@ -70,13 +66,7 @@ class Agent5(GraphEntity):
 
     def survey_and_update_beliefs(self,graph:Graph, close_nodes): 
         # Updating priors with the fact predator prey is not at current position
-        sums = 0.0
-        for node in range(0,self.node_count):
-            if node != self.position:
-                sums += self.belief[node]
-            else:
-                self.belief[node]=0
-        self.belief = [x/sums for x in self.belief]
+        self.belief = getNewBeliefs(self.belief,self.position,False)
         
         if True or not Environment.getInstance().careful:        
             max_val = max(self.belief)
@@ -91,19 +81,7 @@ class Agent5(GraphEntity):
         print("Surveying : ",survey_node)
 
         # Updating Priors with fact that predator not at survey location
-        if not survey_res:
-            sums = 0.0
-            print("No predator XO")
-            for node in range(0,self.node_count):
-                if node != survey_node:
-                    sums += self.belief[node]
-                else:
-                    self.belief[node]=0
-            self.belief = [x/sums for x in self.belief]
-        else:
-            print("Found predator! RUNN!")
-            for node in range(0,self.node_count):
-                self.belief[node] = 0.0 if node!=survey_node else 1.0
+        self.belief = getNewBeliefs(self.belief,survey_node,survey_res)
                     
                 
 
