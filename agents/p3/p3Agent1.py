@@ -32,109 +32,77 @@ class P3Agent1(GraphEntity):
 
     @staticmethod
     def calculateValues(policy, graph: Graph):
-        # print(policy)
-        # print(policy,graph)
+        
+        # values of the states
         values = {}
+        # marked when value is calculated
         done = {}
-        added = {}
+        # storing new state probs of a state
         neigborsProbs = {}
 
-        for key in policy.keys():
-            if key[2] == key[0]:
-                values[key] = P3Agent1.someBigNumber
-                done[key] = True
+        # sort states based on prey & agent distance
+        def sortStates(state):
+            return get_shortest_path(graph.info, state[0], state[1])
+        states = list(policy.keys())
+        states.sort(key=sortStates)
+
+        # for each state
+        for state in policy.keys():
+            if state[2] == state[0]:
+                values[state] = P3Agent1.someBigNumber
+                done[state] = True
             else:
-                if key[1] == key[0]:
-                    values[key] = 0
-                    done[key] = True
+                if state[1] == state[0]:
+                    values[state] = 0
+                    done[state] = True
                 else:
-                    values[key] = 0
-                    done[key] = False
-                    added[key] = False
+                    values[state] = 0
+                    done[state] = False
 
             probs = {}
-            prey_options = graph.info[key[1]] + [key[1]]
-            predator_options = graph.info[key[2]]
+            prey_options = graph.info[state[1]] + [state[1]]
+            predator_options = graph.info[state[2]]
 
             dists = []
             for opt in predator_options:
-                dists.append(get_shortest_path(graph.info, opt, policy[key]))
+                dists.append(get_shortest_path(graph.info, opt, policy[state]))
 
             predator_nearest_neighs = [predator_options[i] for i in range(
                 0, len(predator_options)) if dists[i] == min(dists)]
 
             for pr in prey_options:
                 for pred in predator_options:
-                    probs[(policy[key], pr, pred)] = (1/len(prey_options))*(0.6*(1/len(predator_nearest_neighs)
+                    probs[(policy[state], pr, pred)] = (1/len(prey_options))*(0.6*(1/len(predator_nearest_neighs)
                                                                                  if pred in predator_nearest_neighs else 0.0)+0.4/len(predator_options))
 
-            neigborsProbs[key] = probs
+            neigborsProbs[state] = probs
 
+        
         def fillValues(key):
             fringe = []
-            fringe.append((key, None))
+            fringe.append((key,None))
 
-            count = {}
-
-            while len(fringe) != 0:
-                # sleep(0.5)
-
+            while len(fringe)!=0:
                 top = fringe.pop()
-                if not top[0] in count.keys():
-                    count[top[0]] = 0
-
-                print(top[0],": ",count[top[0]]," || ",values[top[0]])
-                if not done[top[0]]:
-                    count[top[0]] +=1
-                    if count[top[0]]>=P3Agent1.someBigNumber:
-                        print("Too many ",top[0])
-                        values[top[0]] = P3Agent1.someBigNumber
-                        done[top[0]] = True
-
-                if done[top[0]]:
-                    while top[1] != None:
-                        values[top[1][0]] += values[top[0]]
-                        top = top[1]
-
-                if not done[top[0]] and not added[top[0]]:
-                    values[top[0]] += 1
-                    added[top[0]] = True
+                curr = top[0]
 
                 p = False
-                for k in neigborsProbs[top[0]]:
-                    if not done[k]:
-                        fringe.append((k, top))
+                for next in neigborsProbs[curr]:
+                    if not done[next]:
                         p = True
-                    # else:
+                        fringe.append((next,curr))
+                
                 if not p:
-                    done[top[0]] = True
+                    done[curr] = True
 
-        def getValueX(key):
-            print(key)
-            if done[key] or (values[key] >= P3Agent1.someBigNumber):
-                if (values[key] >= P3Agent1.someBigNumber):
-                    print("Too big")
-                elif values[key] == 0:
-                    print("End")
-                return values[key]
-            else:
-                values[key] = 1
-                for k in neigborsProbs[key]:
-                    values[k] += neigborsProbs[key][k]*getValueX(k)
-
-                done[key] = True
-                return values[key]
-
-        def sortStates(state):
-            return get_shortest_path(graph.info, state[0], state[1])
-        states = list(policy.keys())
-        print(len(states))
-
-        states.sort(key=sortStates)
-        for key in states:
-            if not done[key]:
+        for state in states:
+            if not done[state]:
                 # print(key)
-                fillValues(key)
+                try:
+                    (state)
+                except RecursionError:
+                    print(values)
+                    raise RecursionError
                 break
-            print(key," : done : ",values[key])
+            print(state," : done : ",values[state])
         return values
