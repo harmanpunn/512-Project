@@ -12,10 +12,10 @@ from renderer import Renderer
 from tqdm import tqdm
 import pygame
 
-from agents.agent1 import Agent1
-from agents.agent3 import Agent3
-from agents.agent5 import Agent5
-from agents.agent7 import Agent7
+from agents.p2.agent1 import Agent1
+from agents.p2.agent3 import Agent3
+from agents.p2.agent5 import Agent5
+from agents.p2.agent7 import Agent7
 
 import numpy as np
 

@@ -1,4 +1,4 @@
-from agents.agent1 import Agent1
+from agents.p2.agent1 import Agent1
 from environment import Environment
 import random
 from graph import Graph
