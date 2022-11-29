@@ -2,6 +2,7 @@ from graphEntity import GraphEntity
 from graph import Graph
 from environment import Environment
 from util import get_shortest_path
+from valueIteration import getValues, getPolicyFromValues
 import random
 
 from time import sleep
@@ -14,21 +15,19 @@ class P3Agent1(GraphEntity):
     def __init__(self, graph: Graph) -> None:
         # super.__init__()
         self.type = 1
+        while True:
+            self.position = random.randint(0,Environment.getInstance().node_count-1)
+            if not graph.node_states[self.position][0] and not graph.node_states[self.position][2]:
+                break
+        graph.allocate_pos(self.position, self.type)
 
-        graphInfo = graph.info
-        self.policy = {}
+        vals , matrix = getValues(graph)
+        self.policy = getPolicyFromValues(vals, matrix)
 
-        for agent in range(0, Environment.getInstance().node_count):
-            for prey in range(0, Environment.getInstance().node_count):
-                for predator in range(0, Environment.getInstance().node_count):
-                    self.policy[(agent, prey, predator)] = random.choice(
-                        graphInfo[agent]+[agent])
-        # print(graph.info)
-        graph.info = {0: [1, 4, 2], 1: [2, 0, 4],
-                      2: [3, 1, 0], 3: [4, 2], 4: [0, 3, 1]}
-        self.policy = {(0, 0, 0): 2, (0, 0, 1): 0, (0, 0, 2): 4, (0, 0, 3): 0, (0, 0, 4): 4, (0, 1, 0): 1, (0, 1, 1): 4, (0, 1, 2): 1, (0, 1, 3): 2, (0, 1, 4): 4, (0, 2, 0): 1, (0, 2, 1): 4, (0, 2, 2): 4, (0, 2, 3): 1, (0, 2, 4): 4, (0, 3, 0): 0, (0, 3, 1): 0, (0, 3, 2): 2, (0, 3, 3): 2, (0, 3, 4): 1, (0, 4, 0): 2, (0, 4, 1): 4, (0, 4, 2): 1, (0, 4, 3): 4, (0, 4, 4): 2, (1, 0, 0): 2, (1, 0, 1): 2, (1, 0, 2): 1, (1, 0, 3): 0, (1, 0, 4): 1, (1, 1, 0): 1, (1, 1, 1): 4, (1, 1, 2): 4, (1, 1, 3): 1, (1, 1, 4): 1, (1, 2, 0): 1, (1, 2, 1): 1, (1, 2, 2): 2, (1, 2, 3): 0, (1, 2, 4): 1, (1, 3, 0): 0, (1, 3, 1): 2, (1, 3, 2): 1, (1, 3, 3): 0, (1, 3, 4): 0, (1, 4, 0): 2, (1, 4, 1): 0, (1, 4, 2): 0, (1, 4, 3): 2, (1, 4, 4): 1, (2, 0, 0): 1, (2, 0, 1): 2, (2, 0, 2): 3, (2, 0, 3): 2, (2, 0, 4): 2, (2, 1, 0): 2, (2, 1, 1): 1, (2, 1, 2): 2, (2, 1, 3): 2, (2, 1, 4): 3, (2, 2, 0): 0, (2, 2, 1): 1, (
-            2, 2, 2): 1, (2, 2, 3): 2, (2, 2, 4): 3, (2, 3, 0): 2, (2, 3, 1): 1, (2, 3, 2): 0, (2, 3, 3): 1, (2, 3, 4): 3, (2, 4, 0): 0, (2, 4, 1): 0, (2, 4, 2): 3, (2, 4, 3): 3, (2, 4, 4): 0, (3, 0, 0): 4, (3, 0, 1): 4, (3, 0, 2): 2, (3, 0, 3): 3, (3, 0, 4): 4, (3, 1, 0): 3, (3, 1, 1): 2, (3, 1, 2): 3, (3, 1, 3): 4, (3, 1, 4): 3, (3, 2, 0): 4, (3, 2, 1): 4, (3, 2, 2): 3, (3, 2, 3): 2, (3, 2, 4): 3, (3, 3, 0): 3, (3, 3, 1): 3, (3, 3, 2): 2, (3, 3, 3): 4, (3, 3, 4): 3, (3, 4, 0): 4, (3, 4, 1): 4, (3, 4, 2): 3, (3, 4, 3): 3, (3, 4, 4): 4, (4, 0, 0): 0, (4, 0, 1): 1, (4, 0, 2): 0, (4, 0, 3): 0, (4, 0, 4): 1, (4, 1, 0): 1, (4, 1, 1): 4, (4, 1, 2): 0, (4, 1, 3): 3, (4, 1, 4): 1, (4, 2, 0): 3, (4, 2, 1): 1, (4, 2, 2): 3, (4, 2, 3): 0, (4, 2, 4): 4, (4, 3, 0): 1, (4, 3, 1): 1, (4, 3, 2): 4, (4, 3, 3): 0, (4, 3, 4): 0, (4, 4, 0): 3, (4, 4, 1): 1, (4, 4, 2): 0, (4, 4, 3): 3, (4, 4, 4): 3}
-        print(P3Agent1.calculateValues(self.policy, graph))
+    def plan(self, graph: Graph, info):
+        state = (self.position, info["prey"],info["predator"])
+        self.nextPosition = self.policy[state]
+        return [1,1]
 
     @staticmethod
     def calculateValues(policy, graph: Graph):
