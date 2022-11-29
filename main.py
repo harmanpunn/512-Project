@@ -12,10 +12,12 @@ from renderer import Renderer
 from tqdm import tqdm
 import pygame
 
-from agents.agent1 import Agent1
-from agents.agent3 import Agent3
-from agents.agent5 import Agent5
-from agents.agent7 import Agent7
+from agents.p2.agent1 import Agent1
+from agents.p2.agent3 import Agent3
+from agents.p2.agent5 import Agent5
+from agents.p2.agent7 import Agent7
+
+from agents.p3.p3Agent1 import P3Agent1
 
 import numpy as np
 
@@ -52,7 +54,8 @@ allowed_args = {
     "quiet":str2bool,
     "noisy_agent":str2bool,
     "graphs":int,
-    "games":int
+    "games":int,
+    "p3":str2bool
 }
 
 def processArgs():
@@ -91,37 +94,38 @@ def runGame(graph : Graph):
     prey = Prey(graph)
     predator = Predator(graph)
 
-    if Environment.getInstance().agent % 2 == 0:
-        Environment.getInstance().careful = True
+    if not Environment.getInstance().p3:
+        if Environment.getInstance().agent % 2 == 0:
+            Environment.getInstance().careful = True
 
-    if Environment.getInstance().agent < 3:
-        agent : GraphEntity = Agent1(graph)
-    elif Environment.getInstance().agent < 5:
-        agent : GraphEntity = Agent3(graph) 
-    elif Environment.getInstance().agent < 7:
-        agent : GraphEntity = Agent5(graph) 
-        agent.belief = [1.0 if i==predator.getPosition() else 0.0 for i in range(0,Environment.getInstance().node_count)]
+        if Environment.getInstance().agent < 3:
+            agent : GraphEntity = Agent1(graph)
+        elif Environment.getInstance().agent < 5:
+            agent : GraphEntity = Agent3(graph) 
+        elif Environment.getInstance().agent < 7:
+            agent : GraphEntity = Agent5(graph) 
+            agent.belief = [1.0 if i==predator.getPosition() else 0.0 for i in range(0,Environment.getInstance().node_count)]
+        else:
+            agent : GraphEntity = Agent7(graph) 
+            agent.predator_belief = [1.0 if i==predator.getPosition() else 0.0 for i in range(0,Environment.getInstance().node_count)]        
+
+            # agent : GraphEntity = get_class("Agent"+str(Environment.getInstance().agent))(graph)
+
+        if Environment.getInstance().agent==9:
+            Environment.getInstance().noisy_agent = True
+            Environment.getInstance().noisy = True
+            Environment.getInstance().careful = True
+
+        if Environment.getInstance().agent==10:
+            Environment.getInstance().noisy = False
+            Environment.getInstance().noisy_agent = False
+            Environment.getInstance().careful = True
+            Environment.getInstance().agentX = True
     else:
-        agent : GraphEntity = Agent7(graph) 
-        agent.predator_belief = [1.0 if i==predator.getPosition() else 0.0 for i in range(0,Environment.getInstance().node_count)]        
-
-        # agent : GraphEntity = get_class("Agent"+str(Environment.getInstance().agent))(graph)
-
-    if Environment.getInstance().agent==9:
-        Environment.getInstance().noisy_agent = True
-        Environment.getInstance().noisy = True
-        Environment.getInstance().careful = True
-
-    if Environment.getInstance().agent==10:
-        Environment.getInstance().noisy = False
-        Environment.getInstance().noisy_agent = False
-        Environment.getInstance().careful = True
-        Environment.getInstance().agentX = True
-    
+        if Environment.getInstance().agent==1:
+            agent : GraphEntity = P3Agent1(graph)
 
     running = 1
-    print(graph.info)
-    # print()
 
     if Environment.getInstance().noisy:
         print("So NOISY!")
@@ -140,20 +144,27 @@ def runGame(graph : Graph):
             graph.surveyed = False
 
             info = {}
-            if Environment.getInstance().agent<3:
-                info = {
-                    'prey' : prey.getPosition(),
-                    'predator' : predator.getPosition()
-                }
-            elif Environment.getInstance().agent<5:
-                info = {
-                    'predator' : predator.getPosition()
-                }
-            elif Environment.getInstance().agent<7:
-                info = {
-                    'prey' : prey.getPosition()
-                }
-                
+            if not Environment.getInstance().p3:
+                if Environment.getInstance().agent<3:
+                    info = {
+                        'prey' : prey.getPosition(),
+                        'predator' : predator.getPosition()
+                    }
+                elif Environment.getInstance().agent<5:
+                    info = {
+                        'predator' : predator.getPosition()
+                    }
+                elif Environment.getInstance().agent<7:
+                    info = {
+                        'prey' : prey.getPosition()
+                    }
+            else:
+                if Environment.getInstance().agent ==1:
+                    info = {
+                        'prey' : prey.getPosition(),
+                        'predator' : predator.getPosition()
+                    }
+
             graph.node_states_blocked= True
             knows = agent.__update__(graph, info)
 

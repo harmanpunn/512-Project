@@ -14,6 +14,7 @@ class Environment:
     def __init__(self, ui,nc) -> None:
         if len(Environment.instances)==0:
             self.ui = ui
+            self.p3 = True
             
             self.node_count = nc
             self.agent = 1
