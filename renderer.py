@@ -71,7 +71,7 @@ class Renderer:
     def __render__(self, running = 1):
         if not Environment.getInstance().ui:
             return
-        self.surface.fill((217,217,217))
+        self.surface.fill((255,255,255))
         
         for i in range(0,len(self.edge_rects)):
             pygame.draw.arc(self.surface,(0,0,0),self.edge_rects[i],self.edge_angles[i][0],self.edge_angles[i][1])
@@ -84,20 +84,20 @@ class Renderer:
             
             if tileState==-1:
                 radius = 10
-                text = self.font.render(str(i), True, (0,0,0))
+                text = self.font.render(str(i), True, (51,51,51))
                 textRect = text.get_rect()
                 textRect.center = self.node_centers[i]
-                pygame.draw.circle(self.surface, (200,200,200), self.node_centers[i], radius)
-                pygame.draw.circle(self.surface, (0,0,0), self.node_centers[i] , radius,width=1)
+                pygame.draw.circle(self.surface, (255,255,255), self.node_centers[i], radius)
+                pygame.draw.circle(self.surface, (51,51,51), self.node_centers[i] , radius,width=1)
                 self.surface.blit(text,textRect)
             else:
                 img = None
                 if tileState == 0 :
-                    img = pygame.image.load("./sprites/predator.png")
+                    img = pygame.image.load("./sprites/cat.png")
                 elif tileState == 1 :
-                    img = pygame.image.load("./sprites/player.png")
+                    img = pygame.image.load("./sprites/mice.png")
                 elif tileState == 2 :
-                    img = pygame.image.load("./sprites/prey.png")
+                    img = pygame.image.load("./sprites/goal.png")
                 
                 # print(tileState)
                 self.surface.blit(img,((self.node_centers[i][0]-16,self.node_centers[i][1]-16)))

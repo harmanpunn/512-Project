@@ -91,13 +91,13 @@ def runGame(graph : Graph):
     prey = Prey(graph)
     predator = Predator(graph)
 
-    agent : GraphEntity = Agent7(graph) 
+    agent : GraphEntity = Agent1(graph) 
     agent.predator_belief = [1.0 if i==predator.getPosition() else 0.0 for i in range(0,Environment.getInstance().node_count)]        
 
     running = 1
     while True:
         if Environment.getInstance().ui:
-            sleep(0.2)
+            sleep(0.5)
             for event in pygame.event.get():
                 if event.type==pygame.QUIT:
                     running =False
@@ -105,11 +105,11 @@ def runGame(graph : Graph):
             graph.surveyed = False
 
             info = {}
-            # if Environment.getInstance().agent<3:
-            #     info = {
-            #         'prey' : prey.getPosition(),
-            #         'predator' : predator.getPosition()
-            #     }
+            if Environment.getInstance().agent<3:
+                info = {
+                    'prey' : prey.getPosition(),
+                    'predator' : predator.getPosition()
+                }
             # elif Environment.getInstance().agent<5:
             #     info = {
             #         'predator' : predator.getPosition()
