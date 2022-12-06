@@ -70,17 +70,17 @@ def getNewBeliefs(belief,survey_node, survey_res):
                 belief[node]=0
         belief =  [x/sums for x in belief]
     else:
-        if not (Environment.getInstance().noisy_agent and Environment.getInstance().noisy):
-            for node in range(0,Environment.getInstance().node_count):
-                belief[node] = 0.0 if node!=survey_node else 1.0
-        else:
-            sums = 0.0
-            for node in range(0,Environment.getInstance().node_count):
-                if node != survey_node:
-                    sums += belief[node]
-                else:
-                    belief[node]=0
-            belief = [0.9*(0.0 if i!=survey_node else 1.0) + 0.1*belief[i]/sums for i in range(0,Environment.getInstance().node_count)]
+        # if not (Environment.getInstance().noisy_agent and Environment.getInstance().noisy):
+        for node in range(0,Environment.getInstance().node_count):
+            belief[node] = 0.0 if node!=survey_node else 1.0
+        # else:
+        #     sums = 0.0
+        #     for node in range(0,Environment.getInstance().node_count):
+        #         if node != survey_node:
+        #             sums += belief[node]
+        #         else:
+        #             belief[node]=0
+        #     belief = [0.9*(0.0 if i!=survey_node else 1.0) + 0.1*belief[i]/sums for i in range(0,Environment.getInstance().node_count)]
     return belief
 
 def transitionProbabilities(belief, graphInfo, closeNodes = None, pred=False):

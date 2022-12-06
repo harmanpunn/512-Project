@@ -47,9 +47,6 @@ allowed_args = {
     "node_count":int,
     "mode":int,
     "agent":strToAgent,
-    "noisy":str2bool,
-    "quiet":str2bool,
-    "noisy_agent":str2bool,
     "graphs":int,
     "games":int,
     "p3":str2bool
@@ -81,17 +78,17 @@ def processArgs():
 
 
 def runGame(graph : Graph):
-
-    # graph = Graph()
     renderer =  Renderer(graph)
-    # print("Initialized")
-    # startGame()
     step_count = 0
     game_state = -2
+
     prey = Prey(graph)
     predator = Predator(graph)
 
-    agent : GraphEntity = Agent1(graph) 
+    # Partial prey and predator setting
+    agent : GraphEntity = Agent7(graph) 
+
+    # Setting predator belief to 1 for predator position initially. 
     agent.predator_belief = [1.0 if i==predator.getPosition() else 0.0 for i in range(0,Environment.getInstance().node_count)]        
 
     running = 1
@@ -207,8 +204,8 @@ if __name__ == "__main__":
     for x in args.keys():
         setattr(env,x,args[x]) 
     
-    if Environment.getInstance().quiet==True:
-        sys.stdout = open(os.devnull, 'w')
+    # if Environment.getInstance().quiet==True:
+    #     sys.stdout = open(os.devnull, 'w')
     if 'mode' in args.keys() and args['mode']==1:
         print("Mode different")
         Environment.getInstance().ui = False

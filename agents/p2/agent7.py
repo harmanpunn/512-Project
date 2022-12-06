@@ -46,31 +46,30 @@ class Agent7(GraphEntity):
         self.prey_belief = getNewBeliefs(self.prey_belief,self.position,False)
 
         survey_or_move = self.survey_or_move(graphInfo)
-        if not Environment.getInstance().agentX or (Environment.getInstance().agentX and survey_or_move):
-            survey_node = -1
-            if (Environment.getInstance().agent==9 and max(self.predator_belief)<0.5) or (Environment.getInstance().agent!=9 and not 1.0 in self.predator_belief):
-                # Use predator beliefs when not certain about predator
-                print("Using predator beliefs")
-                max_val = max(self.predator_belief)
-                max_beliefs = [i for i, v in enumerate(self.predator_belief) if v==max_val]
-                survey_node = random.choice(max_beliefs)
-            else:
-                # Use prey beliefs when certain about predator
-                print("Using prey beliefs")
-                max_val = max(self.prey_belief)
-                max_beliefs = [i for i, v in enumerate(self.prey_belief) if v==max_val]
-                survey_node = random.choice(max_beliefs)
-            
-            survey_node_state = graph.survey(survey_node)
+        survey_node = -1
+        if (Environment.getInstance().agent==9 and max(self.predator_belief)<0.5) or (Environment.getInstance().agent!=9 and not 1.0 in self.predator_belief):
+            # Use predator beliefs when not certain about predator
+            print("Using predator beliefs")
+            max_val = max(self.predator_belief)
+            max_beliefs = [i for i, v in enumerate(self.predator_belief) if v==max_val]
+            survey_node = random.choice(max_beliefs)
+        else:
+            # Use prey beliefs when certain about predator
+            print("Using prey beliefs")
+            max_val = max(self.prey_belief)
+            max_beliefs = [i for i, v in enumerate(self.prey_belief) if v==max_val]
+            survey_node = random.choice(max_beliefs)
+        
+        survey_node_state = graph.survey(survey_node)
 
-            survey_res = survey_node_state[2]
-            # Updating Priors with fact about prey at survey location
-            self.prey_belief = getNewBeliefs(self.prey_belief,survey_node, survey_res)
+        survey_res = survey_node_state[2]
+        # Updating Priors with fact about prey at survey location
+        self.prey_belief = getNewBeliefs(self.prey_belief,survey_node, survey_res)
 
-            if not 1.0 in self.predator_belief:
-                survey_res = survey_node_state[0]
-                # Updating Priors with fact that predator not at survey location
-                self.predator_belief = getNewBeliefs(self.predator_belief,survey_node,survey_res)
+        if not 1.0 in self.predator_belief:
+            survey_res = survey_node_state[0]
+            # Updating Priors with fact that predator not at survey location
+            self.predator_belief = getNewBeliefs(self.predator_belief,survey_node,survey_res)
 
         knows = [0,0] 
         if max(self.predator_belief)==1.0:
@@ -97,8 +96,8 @@ class Agent7(GraphEntity):
         Environment.getInstance().expected_prey =  deepcopy(max_beliefs)
         prey = random.choice(max_beliefs)
 
-        if Environment.getInstance().agentX and survey_or_move:
-            return knows
+        # if Environment.getInstance().agentX and survey_or_move:
+        #     return knows
 
         print('Agent Pos Curr:', self.position)
         print('Expected Prey Position:', prey)

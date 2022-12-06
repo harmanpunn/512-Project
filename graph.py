@@ -44,8 +44,8 @@ class Graph:
         # Graph connected in a large cirle
         for i in range(0,self.node_count):
             node_list.append(i)
-            graph[i].append((i+1)%self.node_count)
-            graph[i].append((i-1 + self.node_count)%self.node_count)
+            graph[i].append((i+1) % self.node_count)
+            graph[i].append((i-1 + self.node_count) % self.node_count)
 
         while len(node_list) > 0 and trial < 100:
             node = random.choice(node_list)
@@ -62,13 +62,10 @@ class Graph:
                     chosen_node = random.choice(lst)
                     while len(graph[chosen_node])>=3 or chosen_node in graph[node] or chosen_node==node:
                         chosen_node = random.choice(lst)
-                    
-
                     graph[node].append(chosen_node)
                     graph[chosen_node].append(node)
                     node_list.remove(chosen_node)
-                # if node in node_list:
-                # node_list.remove(node)
+               
             trial+=1    
 
         return graph    
@@ -83,17 +80,7 @@ class Graph:
         if not self.surveyed:
             # Surveyed for the first time
             self.surveyed = True
-            if not Environment.getInstance().noisy:
-                return self._node_states[x]
-            else:
-                t = deepcopy(self._node_states[x])
-                p = random.random()
-                if p>0.9:
-                    t = [False for _ in t]
-                return t
-            # if Environment.getInstance().agent<5:
-            #     return self._node_states[x][2]
-            # elif Environment.getInstance().agent<7:
-            #     return self._node_states[x][1]
+            return self._node_states[x]
+            
         else:
             raise AttributeError("Surveying Multiple times!")

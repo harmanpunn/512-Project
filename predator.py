@@ -36,31 +36,3 @@ class Predator(GraphEntity):
             
         # Update position of the predator
         self.nextPosition = next_position
-
-
-    def shortest_path(self, graph, src, dest, distance, predecessor):
-        queue = []
-        visited = [False for i in range(len(graph))]
-
-        queue.append(src)
-        distance[src] = 0
-        visited[src] = True
-
-        print('src:', src)
-        while len(queue) != 0:
-            curr = queue[0]
-            queue.pop(0)
-
-            for i in range(len(graph[curr])):
-                
-                if visited[graph[curr][i]] == False:
-                    distance[graph[curr][i]] = distance[curr] + 1
-                    predecessor[graph[curr][i]] = curr
-                    visited[graph[curr][i]] = True
-                    queue.append(graph[curr][i])
-
-                    if graph[curr][i] == dest:
-                        return True
-
-        return False
-

@@ -33,13 +33,13 @@ class Agent1(GraphEntity):
 
     @staticmethod
     def get_next_position(prey, predator, graphInfo, curr_agent):
+        
+        # Shortest path to prey
         agent_shortest_dist_prey = get_shortest_path(graphInfo, curr_agent, prey)
         print('agent_shortest_dist_prey:', agent_shortest_dist_prey)
+       
         # Shortest Path to predator
-        if Environment.getInstance().agent>5 and Environment.getInstance().careful :
-            agent_shortest_dist_predator = Agent1.getExpectedDist(graphInfo,predator,curr_agent)
-        else:
-            agent_shortest_dist_predator = get_shortest_path(graphInfo, curr_agent, predator)
+        agent_shortest_dist_predator = get_shortest_path(graphInfo, curr_agent, predator)
 
         print('agent_shortest_dist_predator:', agent_shortest_dist_predator)
 
@@ -51,10 +51,7 @@ class Agent1(GraphEntity):
             path_len_to_prey = get_shortest_path(graphInfo, el, prey)
             
             # Shortest Path to predator
-            if Environment.getInstance().careful:
-                path_len_to_predator = Agent1.getNewPredatorDist(graphInfo,predator,el)
-            else:
-                path_len_to_predator = get_shortest_path(graphInfo, el, predator)
+            path_len_to_predator = get_shortest_path(graphInfo, el, predator)
             
             # Updating the lookup table
             lookup_table[el] = [path_len_to_predator, path_len_to_prey]
@@ -101,10 +98,10 @@ class Agent1(GraphEntity):
 
         print(order_list)
         ls = [item for item in order_list if len(item)!=0]
-        if Environment.getInstance().careful and len(ls)==0:
-            if len(close_to_prey) ==0:
-                return curr_agent
-            return random.choice(close_to_prey)
+        # if Environment.getInstance().careful and len(ls)==0:
+        #     if len(close_to_prey) ==0:
+        #         return curr_agent
+        #     return random.choice(close_to_prey)
         if len(ls)==0:
             return curr_agent
         # print('order_list:', order_list)
